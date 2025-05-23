@@ -31,6 +31,8 @@ runs = 1000
 mainnet = "${ETHEREUM_RPC}"
 optimism = "${OPTIMISM_RPC}"
 base = "${BASE_RPC}"
+sepolia = "${SEPOLIA_RPC}"
+lisk = "${LISK_RPC}"
 
 [etherscan]
 mainnet = { key = "${ETHERSCAN_API_KEY}", chain = "mainnet" }
