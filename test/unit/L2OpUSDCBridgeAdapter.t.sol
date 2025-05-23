@@ -2,20 +2,20 @@ pragma solidity ^0.8.25;
 
 import {Ownable} from '@openzeppelin/contracts/access/Ownable.sol';
 import {ERC1967Proxy} from '@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol';
-import {L2OpUSDCBridgeAdapter} from 'contracts/L2OpUSDCBridgeAdapter.sol';
-import {IOpUSDCBridgeAdapter} from 'interfaces/IOpUSDCBridgeAdapter.sol';
-import {OpUSDCBridgeAdapter} from 'src/contracts/universal/OpUSDCBridgeAdapter.sol';
+import {L2OpEURCBridgeAdapter} from 'contracts/L2OpEURCBridgeAdapter.sol';
+import {IOpEURCBridgeAdapter} from 'interfaces/IOpEURCBridgeAdapter.sol';
+import {OpEURCBridgeAdapter} from 'src/contracts/universal/OpEURCBridgeAdapter.sol';
 import {Helpers} from 'test/utils/Helpers.sol';
 
-contract ForTestL2OpUSDCBridgeAdapter is L2OpUSDCBridgeAdapter {
+contract ForTestL2OpEURCBridgeAdapter is L2OpEURCBridgeAdapter {
   /// @notice Number of calls to forTest_dummy
   uint256 public calls;
 
   constructor(
-    address _usdc,
+    address _eurc,
     address _messenger,
     address _linkedAdapter
-  ) L2OpUSDCBridgeAdapter(_usdc, _messenger, _linkedAdapter) {}
+  ) L2OpEURCBridgeAdapter(_eurc, _messenger, _linkedAdapter) {}
 
   function forTest_setMessengerStatus(Status _status) external {
     messengerStatus = _status;
@@ -35,16 +35,16 @@ contract ForTestL2OpUSDCBridgeAdapter is L2OpUSDCBridgeAdapter {
 }
 
 abstract contract Base is Helpers {
-  string internal constant _NAME = 'OpUSDCBridgeAdapter';
+  string internal constant _NAME = 'OpEURCBridgeAdapter';
   string internal constant _VERSION = '1.0.0';
   bytes4 internal constant _UPGRADE_TO_SELECTOR = 0x3659cfe6;
   bytes4 internal constant _UPGRADE_TO_AND_CALL_SELECTOR = 0x4f1ef286;
 
-  ForTestL2OpUSDCBridgeAdapter public adapter;
+  ForTestL2OpEURCBridgeAdapter public adapter;
 
   address internal _user = makeAddr('user');
   address internal _owner = makeAddr('owner');
-  address internal _usdc = makeAddr('opUSDC');
+  address internal _eurc = makeAddr('opEURC');
   address internal _messenger = makeAddr('messenger');
   address internal _linkedAdapter = makeAddr('linkedAdapter');
   address internal _adapterImpl;
@@ -56,24 +56,24 @@ abstract contract Base is Helpers {
     address indexed _user, address indexed _to, uint256 _amount, address indexed _messenger, uint32 _minGasLimit
   );
   event MessageReceived(address indexed _spender, address indexed _user, uint256 _amount, address indexed _messenger);
-  event USDCFunctionSent(bytes4 _functionSignature);
+  event EURCFunctionSent(bytes4 _functionSignature);
 
   function setUp() public virtual {
     (_signerAd, _signerPk) = makeAddrAndKey('signer');
 
-    _adapterImpl = address(new ForTestL2OpUSDCBridgeAdapter(_usdc, _messenger, _linkedAdapter));
-    adapter = ForTestL2OpUSDCBridgeAdapter(
-      address(new ERC1967Proxy(_adapterImpl, abi.encodeCall(OpUSDCBridgeAdapter.initialize, _owner)))
+    _adapterImpl = address(new ForTestL2OpEURCBridgeAdapter(_eurc, _messenger, _linkedAdapter));
+    adapter = ForTestL2OpEURCBridgeAdapter(
+      address(new ERC1967Proxy(_adapterImpl, abi.encodeCall(OpEURCBridgeAdapter.initialize, _owner)))
     );
   }
 }
 
-contract L2OpUSDCBridgeAdapter_Unit_Constructor is Base {
+contract L2OpEURCBridgeAdapter_Unit_Constructor is Base {
   /**
    * @notice Check that the constructor works as expected
    */
   function test_immutables() public view {
-    assertEq(adapter.USDC(), _usdc, 'USDC should be set to the provided address');
+    assertEq(adapter.EURC(), _eurc, 'EURC should be set to the provided address');
     assertEq(adapter.MESSENGER(), _messenger, 'Messenger should be set to the provided address');
     assertEq(adapter.LINKED_ADAPTER(), _linkedAdapter, 'Linked adapter should be set to the provided address');
     assertEq(adapter.owner(), _owner, 'Owner should be set to the provided address');
@@ -84,14 +84,14 @@ contract L2OpUSDCBridgeAdapter_Unit_Constructor is Base {
 /*///////////////////////////////////////////////////////////////
                               MIGRATION
   ///////////////////////////////////////////////////////////////*/
-contract L2OpUSDCBridgeAdapter_Unit_ReceiveMigrateToNative is Base {
+contract L2OpEURCBridgeAdapter_Unit_ReceiveMigrateToNative is Base {
   /**
    * @notice Check that the upgradeToAndCall function reverts if the sender is not MESSENGER
    */
   function test_revertIfNotMessenger(address _roleCaller, uint32 _setBurnAmountMinGasLimit) external {
     // Execute
     vm.prank(_user);
-    vm.expectRevert(IOpUSDCBridgeAdapter.IOpUSDCBridgeAdapter_InvalidSender.selector);
+    vm.expectRevert(IOpEURCBridgeAdapter.IOpEURCBridgeAdapter_InvalidSender.selector);
     adapter.receiveMigrateToNative(_roleCaller, _setBurnAmountMinGasLimit);
   }
 
@@ -104,7 +104,7 @@ contract L2OpUSDCBridgeAdapter_Unit_ReceiveMigrateToNative is Base {
 
     // Execute
     vm.prank(_messenger);
-    vm.expectRevert(IOpUSDCBridgeAdapter.IOpUSDCBridgeAdapter_InvalidSender.selector);
+    vm.expectRevert(IOpEURCBridgeAdapter.IOpEURCBridgeAdapter_InvalidSender.selector);
     adapter.receiveMigrateToNative(_roleCaller, _setBurnAmountMinGasLimit);
   }
 
@@ -115,8 +115,8 @@ contract L2OpUSDCBridgeAdapter_Unit_ReceiveMigrateToNative is Base {
     // Mock calls
     vm.mockCall(_messenger, abi.encodeWithSignature('xDomainMessageSender()'), abi.encode(_linkedAdapter));
 
-    _mockAndExpect(_usdc, abi.encodeWithSignature('totalSupply()'), abi.encode(_burnAmount));
-    _mockAndExpect(_usdc, abi.encodeWithSignature('removeMinter(address)', adapter), abi.encode(true));
+    _mockAndExpect(_eurc, abi.encodeWithSignature('totalSupply()'), abi.encode(_burnAmount));
+    _mockAndExpect(_eurc, abi.encodeWithSignature('removeMinter(address)', adapter), abi.encode(true));
     _mockAndExpect(
       _messenger,
       abi.encodeWithSignature(
@@ -137,8 +137,8 @@ contract L2OpUSDCBridgeAdapter_Unit_ReceiveMigrateToNative is Base {
     // Mock calls
     vm.mockCall(_messenger, abi.encodeWithSignature('xDomainMessageSender()'), abi.encode(_linkedAdapter));
 
-    _mockAndExpect(_usdc, abi.encodeWithSignature('totalSupply()'), abi.encode(100));
-    _mockAndExpect(_usdc, abi.encodeWithSignature('removeMinter(address)', adapter), abi.encode(true));
+    _mockAndExpect(_eurc, abi.encodeWithSignature('totalSupply()'), abi.encode(100));
+    _mockAndExpect(_eurc, abi.encodeWithSignature('removeMinter(address)', adapter), abi.encode(true));
     _mockAndExpect(
       _messenger,
       abi.encodeWithSignature(
@@ -155,7 +155,7 @@ contract L2OpUSDCBridgeAdapter_Unit_ReceiveMigrateToNative is Base {
     adapter.receiveMigrateToNative(_roleCaller, _setBurnAmountMinGasLimit);
     assertEq(
       uint256(adapter.messengerStatus()),
-      uint256(IOpUSDCBridgeAdapter.Status.Deprecated),
+      uint256(IOpEURCBridgeAdapter.Status.Deprecated),
       'Messaging should be disabled'
     );
     assertEq(adapter.roleCaller(), _roleCaller, 'Role caller should be set to the new owner');
@@ -167,10 +167,10 @@ contract L2OpUSDCBridgeAdapter_Unit_ReceiveMigrateToNative is Base {
   function test_emitEvent(address _roleCaller, uint32 _setBurnAmountMinGasLimit, uint256 _burnAmount) external {
     // Mock calls
     vm.mockCall(_messenger, abi.encodeWithSignature('xDomainMessageSender()'), abi.encode(_linkedAdapter));
-    vm.mockCall(_usdc, abi.encodeWithSignature('transferOwnership(address)', _roleCaller), abi.encode());
-    vm.mockCall(_usdc, abi.encodeWithSignature('changeAdmin(address)', _roleCaller), abi.encode());
-    vm.mockCall(_usdc, abi.encodeWithSignature('totalSupply()'), abi.encode(_burnAmount));
-    vm.mockCall(_usdc, abi.encodeWithSignature('removeMinter(address)', adapter), abi.encode(true));
+    vm.mockCall(_eurc, abi.encodeWithSignature('transferOwnership(address)', _roleCaller), abi.encode());
+    vm.mockCall(_eurc, abi.encodeWithSignature('changeAdmin(address)', _roleCaller), abi.encode());
+    vm.mockCall(_eurc, abi.encodeWithSignature('totalSupply()'), abi.encode(_burnAmount));
+    vm.mockCall(_eurc, abi.encodeWithSignature('removeMinter(address)', adapter), abi.encode(true));
     vm.mockCall(
       _messenger,
       abi.encodeWithSignature(
@@ -192,7 +192,7 @@ contract L2OpUSDCBridgeAdapter_Unit_ReceiveMigrateToNative is Base {
   }
 }
 
-contract L2OpUSDCBridgeAdapter_Unit_TransferUSDCRoles is Base {
+contract L2OpEURCBridgeAdapter_Unit_TransferEURCRoles is Base {
   /**
    * @notice Check that the function reverts if the sender is not the roleCaller
    */
@@ -201,8 +201,8 @@ contract L2OpUSDCBridgeAdapter_Unit_TransferUSDCRoles is Base {
 
     // Execute
     vm.prank(_notRoleCaller);
-    vm.expectRevert(IOpUSDCBridgeAdapter.IOpUSDCBridgeAdapter_InvalidCaller.selector);
-    adapter.transferUSDCRoles(_owner);
+    vm.expectRevert(IOpEURCBridgeAdapter.IOpEURCBridgeAdapter_InvalidCaller.selector);
+    adapter.transferEURCRoles(_owner);
   }
 
   /**
@@ -212,19 +212,19 @@ contract L2OpUSDCBridgeAdapter_Unit_TransferUSDCRoles is Base {
     adapter.forTest_setRoleCaller(_roleCaller);
 
     // Mock calls
-    _mockAndExpect(_usdc, abi.encodeWithSignature('transferOwnership(address)', _roleCaller), abi.encode());
-    _mockAndExpect(_usdc, abi.encodeWithSignature('changeAdmin(address)', _roleCaller), abi.encode());
+    _mockAndExpect(_eurc, abi.encodeWithSignature('transferOwnership(address)', _roleCaller), abi.encode());
+    _mockAndExpect(_eurc, abi.encodeWithSignature('changeAdmin(address)', _roleCaller), abi.encode());
 
     // Execute
     vm.prank(_roleCaller);
-    adapter.transferUSDCRoles(_roleCaller);
+    adapter.transferEURCRoles(_roleCaller);
   }
 }
 
 /*///////////////////////////////////////////////////////////////
                           MESSAGING CONTROL
   ///////////////////////////////////////////////////////////////*/
-contract L2OpUSDCBridgeAdapter_Unit_ReceiveStopMessaging is Base {
+contract L2OpEURCBridgeAdapter_Unit_ReceiveStopMessaging is Base {
   event MessagingStopped(address _messenger);
 
   /**
@@ -235,11 +235,11 @@ contract L2OpUSDCBridgeAdapter_Unit_ReceiveStopMessaging is Base {
 
     // Execute
     vm.prank(_notMessenger);
-    vm.expectRevert(IOpUSDCBridgeAdapter.IOpUSDCBridgeAdapter_InvalidSender.selector);
+    vm.expectRevert(IOpEURCBridgeAdapter.IOpEURCBridgeAdapter_InvalidSender.selector);
     adapter.receiveStopMessaging();
     assertEq(
       uint256(adapter.messengerStatus()),
-      uint256(IOpUSDCBridgeAdapter.Status.Active),
+      uint256(IOpEURCBridgeAdapter.Status.Active),
       'Messaging should not be disabled'
     );
   }
@@ -254,11 +254,11 @@ contract L2OpUSDCBridgeAdapter_Unit_ReceiveStopMessaging is Base {
 
     // Execute
     vm.prank(_messenger);
-    vm.expectRevert(IOpUSDCBridgeAdapter.IOpUSDCBridgeAdapter_InvalidSender.selector);
+    vm.expectRevert(IOpEURCBridgeAdapter.IOpEURCBridgeAdapter_InvalidSender.selector);
     adapter.receiveStopMessaging();
     assertEq(
       uint256(adapter.messengerStatus()),
-      uint256(IOpUSDCBridgeAdapter.Status.Active),
+      uint256(IOpEURCBridgeAdapter.Status.Active),
       'Messaging should not be disabled'
     );
   }
@@ -267,13 +267,13 @@ contract L2OpUSDCBridgeAdapter_Unit_ReceiveStopMessaging is Base {
    * @notice Check that function reverts if status is Deprecated
    */
   function test_revertIfDeprecated() external {
-    adapter.forTest_setMessengerStatus(IOpUSDCBridgeAdapter.Status.Deprecated);
+    adapter.forTest_setMessengerStatus(IOpEURCBridgeAdapter.Status.Deprecated);
 
     _mockAndExpect(_messenger, abi.encodeWithSignature('xDomainMessageSender()'), abi.encode(_linkedAdapter));
 
     // Execute
     vm.prank(_messenger);
-    vm.expectRevert(IOpUSDCBridgeAdapter.IOpUSDCBridgeAdapter_MessagingDisabled.selector);
+    vm.expectRevert(IOpEURCBridgeAdapter.IOpEURCBridgeAdapter_MessagingDisabled.selector);
     adapter.receiveStopMessaging();
   }
 
@@ -287,7 +287,7 @@ contract L2OpUSDCBridgeAdapter_Unit_ReceiveStopMessaging is Base {
     vm.prank(_messenger);
     adapter.receiveStopMessaging();
     assertEq(
-      uint256(adapter.messengerStatus()), uint256(IOpUSDCBridgeAdapter.Status.Paused), 'Messaging should be disabled'
+      uint256(adapter.messengerStatus()), uint256(IOpEURCBridgeAdapter.Status.Paused), 'Messaging should be disabled'
     );
   }
 
@@ -308,7 +308,7 @@ contract L2OpUSDCBridgeAdapter_Unit_ReceiveStopMessaging is Base {
   }
 }
 
-contract L2OpUSDCBridgeAdapter_Unit_ReceiveResumeMessaging is Base {
+contract L2OpEURCBridgeAdapter_Unit_ReceiveResumeMessaging is Base {
   event MessagingResumed(address _messenger);
 
   /**
@@ -319,7 +319,7 @@ contract L2OpUSDCBridgeAdapter_Unit_ReceiveResumeMessaging is Base {
 
     // Execute
     vm.prank(_notMessenger);
-    vm.expectRevert(IOpUSDCBridgeAdapter.IOpUSDCBridgeAdapter_InvalidSender.selector);
+    vm.expectRevert(IOpEURCBridgeAdapter.IOpEURCBridgeAdapter_InvalidSender.selector);
     adapter.receiveResumeMessaging();
   }
 
@@ -333,7 +333,7 @@ contract L2OpUSDCBridgeAdapter_Unit_ReceiveResumeMessaging is Base {
 
     // Execute
     vm.prank(_messenger);
-    vm.expectRevert(IOpUSDCBridgeAdapter.IOpUSDCBridgeAdapter_InvalidSender.selector);
+    vm.expectRevert(IOpEURCBridgeAdapter.IOpEURCBridgeAdapter_InvalidSender.selector);
     adapter.receiveResumeMessaging();
   }
 
@@ -341,13 +341,13 @@ contract L2OpUSDCBridgeAdapter_Unit_ReceiveResumeMessaging is Base {
    * @notice Check that function reverts if status is Deprecated
    */
   function test_revertIfDeprecated() external {
-    adapter.forTest_setMessengerStatus(IOpUSDCBridgeAdapter.Status.Deprecated);
+    adapter.forTest_setMessengerStatus(IOpEURCBridgeAdapter.Status.Deprecated);
 
     _mockAndExpect(_messenger, abi.encodeWithSignature('xDomainMessageSender()'), abi.encode(_linkedAdapter));
 
     // Execute
     vm.prank(_messenger);
-    vm.expectRevert(IOpUSDCBridgeAdapter.IOpUSDCBridgeAdapter_MessagingDisabled.selector);
+    vm.expectRevert(IOpEURCBridgeAdapter.IOpEURCBridgeAdapter_MessagingDisabled.selector);
     adapter.receiveResumeMessaging();
   }
 
@@ -361,7 +361,7 @@ contract L2OpUSDCBridgeAdapter_Unit_ReceiveResumeMessaging is Base {
     vm.prank(_messenger);
     adapter.receiveResumeMessaging();
     assertEq(
-      uint256(adapter.messengerStatus()), uint256(IOpUSDCBridgeAdapter.Status.Active), 'Messaging should be enabled'
+      uint256(adapter.messengerStatus()), uint256(IOpEURCBridgeAdapter.Status.Active), 'Messaging should be enabled'
     );
   }
 
@@ -386,14 +386,14 @@ contract L2OpUSDCBridgeAdapter_Unit_ReceiveResumeMessaging is Base {
                              MESSAGING
   ///////////////////////////////////////////////////////////////*/
 
-contract L2OpUSDCBridgeAdapter_Unit_SendMessage is Base {
+contract L2OpEURCBridgeAdapter_Unit_SendMessage is Base {
   /**
    * @notice Check that the function reverts if the address is zero
    */
   function test_revertOnZeroAddress(uint256 _amount, uint32 _minGasLimit) external {
     // Execute
     vm.prank(_user);
-    vm.expectRevert(IOpUSDCBridgeAdapter.IOpUSDCBridgeAdapter_InvalidAddress.selector);
+    vm.expectRevert(IOpEURCBridgeAdapter.IOpEURCBridgeAdapter_InvalidAddress.selector);
     adapter.sendMessage(address(0), _amount, _minGasLimit);
   }
 
@@ -402,10 +402,10 @@ contract L2OpUSDCBridgeAdapter_Unit_SendMessage is Base {
    */
   function test_revertOnBlacklistedAddress(address _to, uint256 _amount, uint32 _minGasLimit) external {
     vm.assume(_to != address(0));
-    vm.mockCall(_usdc, abi.encodeWithSignature('isBlacklisted(address)', _to), abi.encode(true));
+    vm.mockCall(_eurc, abi.encodeWithSignature('isBlacklisted(address)', _to), abi.encode(true));
     // Execute
     vm.prank(_user);
-    vm.expectRevert(IOpUSDCBridgeAdapter.IOpUSDCBridgeAdapter_BlacklistedAddress.selector);
+    vm.expectRevert(IOpEURCBridgeAdapter.IOpEURCBridgeAdapter_BlacklistedAddress.selector);
     adapter.sendMessage(_to, _amount, _minGasLimit);
   }
 
@@ -414,11 +414,11 @@ contract L2OpUSDCBridgeAdapter_Unit_SendMessage is Base {
    */
   function test_revertOnMessagingPaused(address _to, uint256 _amount, uint32 _minGasLimit) external {
     vm.assume(_to != address(0));
-    adapter.forTest_setMessengerStatus(IOpUSDCBridgeAdapter.Status.Paused);
-    vm.mockCall(_usdc, abi.encodeWithSignature('isBlacklisted(address)', _to), abi.encode(false));
+    adapter.forTest_setMessengerStatus(IOpEURCBridgeAdapter.Status.Paused);
+    vm.mockCall(_eurc, abi.encodeWithSignature('isBlacklisted(address)', _to), abi.encode(false));
     // Execute
     vm.prank(_user);
-    vm.expectRevert(IOpUSDCBridgeAdapter.IOpUSDCBridgeAdapter_MessagingDisabled.selector);
+    vm.expectRevert(IOpEURCBridgeAdapter.IOpEURCBridgeAdapter_MessagingDisabled.selector);
     adapter.sendMessage(_to, _amount, _minGasLimit);
   }
 
@@ -434,12 +434,12 @@ contract L2OpUSDCBridgeAdapter_Unit_SendMessage is Base {
     uint32 _minGasLimit
   ) external {
     vm.assume(_to != address(0));
-    vm.mockCall(_usdc, abi.encodeWithSignature('isBlacklisted(address)', _to), abi.encode(false));
+    vm.mockCall(_eurc, abi.encodeWithSignature('isBlacklisted(address)', _to), abi.encode(false));
     adapter.forTest_setUserNonce(_signerAd, _nonce, true);
 
     // Execute
     vm.prank(_user);
-    vm.expectRevert(IOpUSDCBridgeAdapter.IOpUSDCBridgeAdapter_InvalidNonce.selector);
+    vm.expectRevert(IOpEURCBridgeAdapter.IOpEURCBridgeAdapter_InvalidNonce.selector);
     adapter.sendMessage(_signerAd, _to, _amount, _signature, _nonce, _deadline, _minGasLimit);
   }
 
@@ -449,12 +449,12 @@ contract L2OpUSDCBridgeAdapter_Unit_SendMessage is Base {
   function test_expectedCall(address _to, uint256 _amount, uint32 _minGasLimit) external {
     vm.assume(_to != address(0));
     _mockAndExpect(
-      _usdc,
+      _eurc,
       abi.encodeWithSignature('transferFrom(address,address,uint256)', _user, address(adapter), _amount),
       abi.encode(true)
     );
-    _mockAndExpect(_usdc, abi.encodeWithSignature('isBlacklisted(address)', _to), abi.encode(false));
-    _mockAndExpect(_usdc, abi.encodeWithSignature('burn(uint256)', _amount), abi.encode(true));
+    _mockAndExpect(_eurc, abi.encodeWithSignature('isBlacklisted(address)', _to), abi.encode(false));
+    _mockAndExpect(_eurc, abi.encodeWithSignature('burn(uint256)', _amount), abi.encode(true));
     _mockAndExpect(
       _messenger,
       abi.encodeWithSignature(
@@ -477,8 +477,8 @@ contract L2OpUSDCBridgeAdapter_Unit_SendMessage is Base {
   function test_emitEvent(address _to, uint256 _amount, uint32 _minGasLimit) external {
     vm.assume(_to != address(0));
     // Mock calls
-    vm.mockCall(_usdc, abi.encodeWithSignature('burn(address,uint256)', _user, _amount), abi.encode(true));
-    vm.mockCall(_usdc, abi.encodeWithSignature('isBlacklisted(address)', _to), abi.encode(false));
+    vm.mockCall(_eurc, abi.encodeWithSignature('burn(address,uint256)', _user, _amount), abi.encode(true));
+    vm.mockCall(_eurc, abi.encodeWithSignature('isBlacklisted(address)', _to), abi.encode(false));
     vm.mockCall(
       _messenger,
       abi.encodeWithSignature(
@@ -500,7 +500,7 @@ contract L2OpUSDCBridgeAdapter_Unit_SendMessage is Base {
   }
 }
 
-contract L2OpUSDCBridgeAdapter_Unit_SendMessageWithSignature is Base {
+contract L2OpEURCBridgeAdapter_Unit_SendMessageWithSignature is Base {
   /**
    * @notice Check that the function reverts if the address is zero
    */
@@ -513,7 +513,7 @@ contract L2OpUSDCBridgeAdapter_Unit_SendMessageWithSignature is Base {
   ) external {
     // Execute
     vm.prank(_user);
-    vm.expectRevert(IOpUSDCBridgeAdapter.IOpUSDCBridgeAdapter_InvalidAddress.selector);
+    vm.expectRevert(IOpEURCBridgeAdapter.IOpEURCBridgeAdapter_InvalidAddress.selector);
     adapter.sendMessage(_signerAd, address(0), _amount, _signature, _nonce, _deadline, _minGasLimit);
   }
 
@@ -529,10 +529,10 @@ contract L2OpUSDCBridgeAdapter_Unit_SendMessageWithSignature is Base {
     uint32 _minGasLimit
   ) external {
     vm.assume(_to != address(0));
-    vm.mockCall(_usdc, abi.encodeWithSignature('isBlacklisted(address)', _to), abi.encode(true));
+    vm.mockCall(_eurc, abi.encodeWithSignature('isBlacklisted(address)', _to), abi.encode(true));
     // Execute
     vm.prank(_user);
-    vm.expectRevert(IOpUSDCBridgeAdapter.IOpUSDCBridgeAdapter_BlacklistedAddress.selector);
+    vm.expectRevert(IOpEURCBridgeAdapter.IOpEURCBridgeAdapter_BlacklistedAddress.selector);
     adapter.sendMessage(_signerAd, _to, _amount, _signature, _nonce, _deadline, _minGasLimit);
   }
   /**
@@ -548,13 +548,13 @@ contract L2OpUSDCBridgeAdapter_Unit_SendMessageWithSignature is Base {
     uint32 _minGasLimit
   ) external {
     vm.assume(_to != address(0));
-    adapter.forTest_setMessengerStatus(IOpUSDCBridgeAdapter.Status.Paused);
+    adapter.forTest_setMessengerStatus(IOpEURCBridgeAdapter.Status.Paused);
 
-    vm.mockCall(_usdc, abi.encodeWithSignature('isBlacklisted(address)', _to), abi.encode(false));
+    vm.mockCall(_eurc, abi.encodeWithSignature('isBlacklisted(address)', _to), abi.encode(false));
 
     // Execute
     vm.prank(_user);
-    vm.expectRevert(IOpUSDCBridgeAdapter.IOpUSDCBridgeAdapter_MessagingDisabled.selector);
+    vm.expectRevert(IOpEURCBridgeAdapter.IOpEURCBridgeAdapter_MessagingDisabled.selector);
     adapter.sendMessage(_signerAd, _to, _amount, _signature, _nonce, _deadline, _minGasLimit);
   }
 
@@ -573,10 +573,10 @@ contract L2OpUSDCBridgeAdapter_Unit_SendMessageWithSignature is Base {
     vm.assume(_to != address(0));
     vm.assume(_timestamp > _deadline);
     vm.warp(_timestamp);
-    vm.mockCall(_usdc, abi.encodeWithSignature('isBlacklisted(address)', _to), abi.encode(false));
+    vm.mockCall(_eurc, abi.encodeWithSignature('isBlacklisted(address)', _to), abi.encode(false));
     // Execute
     vm.prank(_user);
-    vm.expectRevert(IOpUSDCBridgeAdapter.IOpUSDCBridgeAdapter_MessageExpired.selector);
+    vm.expectRevert(IOpEURCBridgeAdapter.IOpEURCBridgeAdapter_MessageExpired.selector);
     adapter.sendMessage(_signerAd, _to, _amount, _signature, _nonce, _deadline, _minGasLimit);
   }
 
@@ -597,10 +597,10 @@ contract L2OpUSDCBridgeAdapter_Unit_SendMessageWithSignature is Base {
     bytes memory _signature = _generateSignature(
       _NAME, _VERSION, _to, _amount, _deadline, _minGasLimit, _nonce, _notSignerAd, _notSignerPk, address(adapter)
     );
-    vm.mockCall(_usdc, abi.encodeWithSignature('isBlacklisted(address)', _to), abi.encode(false));
+    vm.mockCall(_eurc, abi.encodeWithSignature('isBlacklisted(address)', _to), abi.encode(false));
     // Execute
     vm.prank(_user);
-    vm.expectRevert(IOpUSDCBridgeAdapter.IOpUSDCBridgeAdapter_InvalidSignature.selector);
+    vm.expectRevert(IOpEURCBridgeAdapter.IOpEURCBridgeAdapter_InvalidSignature.selector);
     adapter.sendMessage(_signerAd, _to, _amount, _signature, _nonce, _deadline, _minGasLimit);
   }
 
@@ -621,13 +621,13 @@ contract L2OpUSDCBridgeAdapter_Unit_SendMessageWithSignature is Base {
       _NAME, _VERSION, _to, _amount, _deadline, _minGasLimit, _nonce, _signerAd, _signerPk, address(adapter)
     );
 
-    _mockAndExpect(_usdc, abi.encodeWithSignature('isBlacklisted(address)', _to), abi.encode(false));
+    _mockAndExpect(_eurc, abi.encodeWithSignature('isBlacklisted(address)', _to), abi.encode(false));
     _mockAndExpect(
-      _usdc,
+      _eurc,
       abi.encodeWithSignature('transferFrom(address,address,uint256)', _signerAd, address(adapter), _amount),
       abi.encode(true)
     );
-    _mockAndExpect(_usdc, abi.encodeWithSignature('burn(uint256)', _amount), abi.encode(true));
+    _mockAndExpect(_eurc, abi.encodeWithSignature('burn(uint256)', _amount), abi.encode(true));
     _mockAndExpect(
       _messenger,
       abi.encodeWithSignature(
@@ -661,13 +661,13 @@ contract L2OpUSDCBridgeAdapter_Unit_SendMessageWithSignature is Base {
       _NAME, _VERSION, _to, _amount, _deadline, _minGasLimit, _nonce, _signerAd, _signerPk, address(adapter)
     );
 
-    vm.mockCall(_usdc, abi.encodeWithSignature('isBlacklisted(address)', _to), abi.encode(false));
+    vm.mockCall(_eurc, abi.encodeWithSignature('isBlacklisted(address)', _to), abi.encode(false));
     vm.mockCall(
-      _usdc,
+      _eurc,
       abi.encodeWithSignature('transferFrom(address,address,uint256)', _user, address(adapter), _amount),
       abi.encode(true)
     );
-    vm.mockCall(_usdc, abi.encodeWithSignature('burn(uint256)', _amount), abi.encode(true));
+    vm.mockCall(_eurc, abi.encodeWithSignature('burn(uint256)', _amount), abi.encode(true));
     vm.mockCall(
       _messenger,
       abi.encodeWithSignature(
@@ -689,7 +689,7 @@ contract L2OpUSDCBridgeAdapter_Unit_SendMessageWithSignature is Base {
   }
 }
 
-contract L2OpUSDCBridgeAdapter_Unit_ReceiveMessage is Base {
+contract L2OpEURCBridgeAdapter_Unit_ReceiveMessage is Base {
   event ReplayedFundsSentBackToL1(address _spender, uint256 _amount);
 
   event MessageFailed(address indexed _spender, address indexed _user, uint256 _amount, address indexed _messenger);
@@ -700,7 +700,7 @@ contract L2OpUSDCBridgeAdapter_Unit_ReceiveMessage is Base {
   function test_revertIfNotMessenger(uint256 _amount) external {
     // Execute
     vm.prank(_user);
-    vm.expectRevert(IOpUSDCBridgeAdapter.IOpUSDCBridgeAdapter_InvalidSender.selector);
+    vm.expectRevert(IOpEURCBridgeAdapter.IOpEURCBridgeAdapter_InvalidSender.selector);
     adapter.receiveMessage(_user, _user, _amount);
   }
 
@@ -715,7 +715,7 @@ contract L2OpUSDCBridgeAdapter_Unit_ReceiveMessage is Base {
 
     // Execute
     vm.prank(_messenger);
-    vm.expectRevert(IOpUSDCBridgeAdapter.IOpUSDCBridgeAdapter_InvalidSender.selector);
+    vm.expectRevert(IOpEURCBridgeAdapter.IOpEURCBridgeAdapter_InvalidSender.selector);
     adapter.receiveMessage(_user, _user, _amount);
   }
 
@@ -723,7 +723,7 @@ contract L2OpUSDCBridgeAdapter_Unit_ReceiveMessage is Base {
    * @notice Check that the function returns the funds if the contract is deprecated
    */
   function test_refundSpenderAfterMigration(uint256 _amount) external {
-    adapter.forTest_setMessengerStatus(IOpUSDCBridgeAdapter.Status.Deprecated);
+    adapter.forTest_setMessengerStatus(IOpEURCBridgeAdapter.Status.Deprecated);
     // Mock calls
     vm.mockCall(_messenger, abi.encodeWithSignature('xDomainMessageSender()'), abi.encode(_linkedAdapter));
 
@@ -747,7 +747,7 @@ contract L2OpUSDCBridgeAdapter_Unit_ReceiveMessage is Base {
    * @notice Check that the function emits the event as expected
    */
   function test_emitReplayedEvent(address _spender, uint256 _amount) external {
-    adapter.forTest_setMessengerStatus(IOpUSDCBridgeAdapter.Status.Deprecated);
+    adapter.forTest_setMessengerStatus(IOpEURCBridgeAdapter.Status.Deprecated);
     // Mock calls
     vm.mockCall(_messenger, abi.encodeWithSignature('xDomainMessageSender()'), abi.encode(_linkedAdapter));
 
@@ -767,7 +767,7 @@ contract L2OpUSDCBridgeAdapter_Unit_ReceiveMessage is Base {
     // Mock calls
     vm.mockCall(_messenger, abi.encodeWithSignature('xDomainMessageSender()'), abi.encode(_linkedAdapter));
 
-    _mockAndExpect(_usdc, abi.encodeWithSignature('mint(address,uint256)', _user, _amount), abi.encode(true));
+    _mockAndExpect(_eurc, abi.encodeWithSignature('mint(address,uint256)', _user, _amount), abi.encode(true));
 
     // Execute
     vm.prank(_messenger);
@@ -781,7 +781,7 @@ contract L2OpUSDCBridgeAdapter_Unit_ReceiveMessage is Base {
     // Mock calls
     vm.mockCall(_messenger, abi.encodeWithSignature('xDomainMessageSender()'), abi.encode(_linkedAdapter));
 
-    vm.mockCall(_usdc, abi.encodeWithSignature('mint(address,uint256)', _user, _amount), abi.encode(true));
+    vm.mockCall(_eurc, abi.encodeWithSignature('mint(address,uint256)', _user, _amount), abi.encode(true));
 
     // Execute
     vm.expectEmit(true, true, true, true);
@@ -800,8 +800,8 @@ contract L2OpUSDCBridgeAdapter_Unit_ReceiveMessage is Base {
 
     // Need to mock call, then mock the revert (foundry bug?)
 
-    vm.mockCall(_usdc, abi.encodeWithSignature('mint(address,uint256)', _user, _amount), abi.encode(true));
-    vm.mockCallRevert(_usdc, abi.encodeWithSignature('mint(address,uint256)', _user, _amount), abi.encode(false));
+    vm.mockCall(_eurc, abi.encodeWithSignature('mint(address,uint256)', _user, _amount), abi.encode(true));
+    vm.mockCallRevert(_eurc, abi.encodeWithSignature('mint(address,uint256)', _user, _amount), abi.encode(false));
     // Execute
     vm.prank(_messenger);
     adapter.receiveMessage(_user, _user, _amount);
@@ -819,8 +819,8 @@ contract L2OpUSDCBridgeAdapter_Unit_ReceiveMessage is Base {
     vm.mockCall(_messenger, abi.encodeWithSignature('xDomainMessageSender()'), abi.encode(_linkedAdapter));
 
     // Need to mock call, then mock the revert (foundry bug?)
-    vm.mockCall(_usdc, abi.encodeWithSignature('mint(address,uint256)', _user, _amount), abi.encode(true));
-    vm.mockCallRevert(_usdc, abi.encodeWithSignature('mint(address,uint256)', _user, _amount), abi.encode(false));
+    vm.mockCall(_eurc, abi.encodeWithSignature('mint(address,uint256)', _user, _amount), abi.encode(true));
+    vm.mockCallRevert(_eurc, abi.encodeWithSignature('mint(address,uint256)', _user, _amount), abi.encode(false));
 
     // Execute
     vm.expectEmit(true, true, true, true);
@@ -831,7 +831,7 @@ contract L2OpUSDCBridgeAdapter_Unit_ReceiveMessage is Base {
   }
 }
 
-contract L2OpUSDCBridgeAdapter_Unit_WithdrawLockedFunds is Base {
+contract L2OpEURCBridgeAdapter_Unit_WithdrawLockedFunds is Base {
   event LockedFundsWithdrawn(address indexed _user, uint256 _amountWithdrawn);
   event LockedFundsSentBackToL1(address indexed _spender, uint256 _amountSent);
 
@@ -844,7 +844,7 @@ contract L2OpUSDCBridgeAdapter_Unit_WithdrawLockedFunds is Base {
     adapter.forTest_setUserLockededFunds(_spender, _user, _amount);
 
     // Mock calls
-    _mockAndExpect(_usdc, abi.encodeWithSignature('mint(address,uint256)', _user, _amount), abi.encode(true));
+    _mockAndExpect(_eurc, abi.encodeWithSignature('mint(address,uint256)', _user, _amount), abi.encode(true));
 
     // Execute
     vm.prank(_user);
@@ -860,7 +860,7 @@ contract L2OpUSDCBridgeAdapter_Unit_WithdrawLockedFunds is Base {
     adapter.forTest_setUserLockededFunds(_spender, _user, _amount);
 
     // Mock calls
-    vm.mockCall(_usdc, abi.encodeWithSignature('mint(address,uint256)', _user, _amount), abi.encode(true));
+    vm.mockCall(_eurc, abi.encodeWithSignature('mint(address,uint256)', _user, _amount), abi.encode(true));
 
     // Execute
     vm.prank(_user);
@@ -875,7 +875,7 @@ contract L2OpUSDCBridgeAdapter_Unit_WithdrawLockedFunds is Base {
     adapter.forTest_setUserLockededFunds(_spender, _user, _amount);
 
     // Mock calls
-    vm.mockCall(_usdc, abi.encodeWithSignature('mint(address,uint256)', _user, _amount), abi.encode(true));
+    vm.mockCall(_eurc, abi.encodeWithSignature('mint(address,uint256)', _user, _amount), abi.encode(true));
 
     // Expect events
     vm.expectEmit(true, true, true, true);
@@ -890,7 +890,7 @@ contract L2OpUSDCBridgeAdapter_Unit_WithdrawLockedFunds is Base {
    * @notice Check that the function expects the correct calls
    */
   function test_expectedCallsIfDeprecated(uint256 _amount, address _user, address _spender) external {
-    adapter.forTest_setMessengerStatus(IOpUSDCBridgeAdapter.Status.Deprecated);
+    adapter.forTest_setMessengerStatus(IOpEURCBridgeAdapter.Status.Deprecated);
     vm.assume(_amount > 0);
     vm.assume(_spender != address(0));
     adapter.forTest_setUserLockededFunds(_spender, _user, _amount);
@@ -916,7 +916,7 @@ contract L2OpUSDCBridgeAdapter_Unit_WithdrawLockedFunds is Base {
    * @notice Check that the updates the state as expected
    */
   function test_updateStateIfDeprecated(uint256 _amount, address _user, address _spender) external {
-    adapter.forTest_setMessengerStatus(IOpUSDCBridgeAdapter.Status.Deprecated);
+    adapter.forTest_setMessengerStatus(IOpEURCBridgeAdapter.Status.Deprecated);
     vm.assume(_amount > 0);
     vm.assume(_spender != address(0));
     adapter.forTest_setUserLockededFunds(_spender, _user, _amount);
@@ -941,7 +941,7 @@ contract L2OpUSDCBridgeAdapter_Unit_WithdrawLockedFunds is Base {
   }
 
   function test_emitsEventIfDeprecated(uint256 _amount, address _user, address _spender) external {
-    adapter.forTest_setMessengerStatus(IOpUSDCBridgeAdapter.Status.Deprecated);
+    adapter.forTest_setMessengerStatus(IOpEURCBridgeAdapter.Status.Deprecated);
     vm.assume(_amount > 0);
     vm.assume(_user != address(0));
     adapter.forTest_setUserLockededFunds(_spender, _user, _amount);
@@ -969,9 +969,9 @@ contract L2OpUSDCBridgeAdapter_Unit_WithdrawLockedFunds is Base {
 }
 
 /*///////////////////////////////////////////////////////////////
-                      BRIDGED USDC FUNCTIONS
+                      BRIDGED EURC FUNCTIONS
 ///////////////////////////////////////////////////////////////*/
-contract L2OpUSDCBridgeAdapter_Unit_CallUsdcTransaction is Base {
+contract L2OpEURCBridgeAdapter_Unit_CallEurcTransaction is Base {
   /**
    * @notice Check that the function reverts if the sender is not the owner
    */
@@ -980,7 +980,7 @@ contract L2OpUSDCBridgeAdapter_Unit_CallUsdcTransaction is Base {
     // Execute
     vm.prank(_notOwner);
     vm.expectRevert(abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, _notOwner));
-    adapter.callUsdcTransaction(_data);
+    adapter.callEurcTransaction(_data);
   }
 
   /**
@@ -990,8 +990,8 @@ contract L2OpUSDCBridgeAdapter_Unit_CallUsdcTransaction is Base {
     _data = bytes.concat(bytes4(0xf2fde38b), _data);
     // Execute
     vm.prank(_owner);
-    vm.expectRevert(IOpUSDCBridgeAdapter.IOpUSDCBridgeAdapter_ForbiddenTransaction.selector);
-    adapter.callUsdcTransaction(_data);
+    vm.expectRevert(IOpEURCBridgeAdapter.IOpEURCBridgeAdapter_ForbiddenTransaction.selector);
+    adapter.callEurcTransaction(_data);
   }
 
   /**
@@ -1001,8 +1001,8 @@ contract L2OpUSDCBridgeAdapter_Unit_CallUsdcTransaction is Base {
     _data = bytes.concat(bytes4(0x8f283970), _data);
     // Execute
     vm.prank(_owner);
-    vm.expectRevert(IOpUSDCBridgeAdapter.IOpUSDCBridgeAdapter_ForbiddenTransaction.selector);
-    adapter.callUsdcTransaction(_data);
+    vm.expectRevert(IOpEURCBridgeAdapter.IOpEURCBridgeAdapter_ForbiddenTransaction.selector);
+    adapter.callEurcTransaction(_data);
   }
 
   /**
@@ -1012,8 +1012,8 @@ contract L2OpUSDCBridgeAdapter_Unit_CallUsdcTransaction is Base {
     _data = bytes.concat(bytes4(0xaa20e1e4), _data);
     // Execute
     vm.prank(_owner);
-    vm.expectRevert(IOpUSDCBridgeAdapter.IOpUSDCBridgeAdapter_ForbiddenTransaction.selector);
-    adapter.callUsdcTransaction(_data);
+    vm.expectRevert(IOpEURCBridgeAdapter.IOpEURCBridgeAdapter_ForbiddenTransaction.selector);
+    adapter.callEurcTransaction(_data);
   }
 
   /**
@@ -1024,7 +1024,7 @@ contract L2OpUSDCBridgeAdapter_Unit_CallUsdcTransaction is Base {
 
     _mockAndExpect(_fallbackAdmin, abi.encodeWithSignature('upgradeTo(address)', _newImplementation), abi.encode());
     vm.prank(_owner);
-    adapter.callUsdcTransaction(abi.encodeWithSignature('upgradeTo(address)', _newImplementation));
+    adapter.callEurcTransaction(abi.encodeWithSignature('upgradeTo(address)', _newImplementation));
   }
 
   /**
@@ -1039,7 +1039,7 @@ contract L2OpUSDCBridgeAdapter_Unit_CallUsdcTransaction is Base {
       abi.encode()
     );
     vm.prank(_owner);
-    adapter.callUsdcTransaction(abi.encodeWithSignature('upgradeToAndCall(address,bytes)', _newImplementation, _data));
+    adapter.callEurcTransaction(abi.encodeWithSignature('upgradeToAndCall(address,bytes)', _newImplementation, _data));
   }
 
   /**
@@ -1052,8 +1052,8 @@ contract L2OpUSDCBridgeAdapter_Unit_CallUsdcTransaction is Base {
       _fallbackAdmin, abi.encodeWithSignature('upgradeTo(address)', _newImplementation), abi.encode(false, '')
     );
     vm.prank(_owner);
-    vm.expectRevert(IOpUSDCBridgeAdapter.IOpUSDCBridgeAdapter_InvalidTransaction.selector);
-    adapter.callUsdcTransaction(abi.encodeWithSignature('upgradeTo(address)', _newImplementation));
+    vm.expectRevert(IOpEURCBridgeAdapter.IOpEURCBridgeAdapter_InvalidTransaction.selector);
+    adapter.callEurcTransaction(abi.encodeWithSignature('upgradeTo(address)', _newImplementation));
   }
 
   /**
@@ -1068,8 +1068,8 @@ contract L2OpUSDCBridgeAdapter_Unit_CallUsdcTransaction is Base {
       abi.encode(false, '')
     );
     vm.prank(_owner);
-    vm.expectRevert(IOpUSDCBridgeAdapter.IOpUSDCBridgeAdapter_InvalidTransaction.selector);
-    adapter.callUsdcTransaction(abi.encodeWithSignature('upgradeToAndCall(address,bytes)', _newImplementation, _data));
+    vm.expectRevert(IOpEURCBridgeAdapter.IOpEURCBridgeAdapter_InvalidTransaction.selector);
+    adapter.callEurcTransaction(abi.encodeWithSignature('upgradeToAndCall(address,bytes)', _newImplementation, _data));
   }
 
   /**
@@ -1078,12 +1078,12 @@ contract L2OpUSDCBridgeAdapter_Unit_CallUsdcTransaction is Base {
   function test_revertOnCallRevert(bytes memory _data) external {
     vm.assume(_data.length >= 4);
     // Mock calls
-    vm.mockCallRevert(_usdc, _data, abi.encode(false, ''));
+    vm.mockCallRevert(_eurc, _data, abi.encode(false, ''));
 
     // Execute
     vm.prank(_owner);
-    vm.expectRevert(IOpUSDCBridgeAdapter.IOpUSDCBridgeAdapter_InvalidTransaction.selector);
-    adapter.callUsdcTransaction(_data);
+    vm.expectRevert(IOpEURCBridgeAdapter.IOpEURCBridgeAdapter_InvalidTransaction.selector);
+    adapter.callEurcTransaction(_data);
   }
 
   /**
@@ -1095,11 +1095,11 @@ contract L2OpUSDCBridgeAdapter_Unit_CallUsdcTransaction is Base {
     bytes4 _selector = bytes4(_data);
     vm.assume(_selector != _UPGRADE_TO_SELECTOR && _selector != _UPGRADE_TO_AND_CALL_SELECTOR);
 
-    _mockAndExpect(_usdc, _data, abi.encode(true, ''));
+    _mockAndExpect(_eurc, _data, abi.encode(true, ''));
 
     // Execute
     vm.prank(_owner);
-    adapter.callUsdcTransaction(_data);
+    adapter.callEurcTransaction(_data);
   }
 
   /**
@@ -1112,19 +1112,19 @@ contract L2OpUSDCBridgeAdapter_Unit_CallUsdcTransaction is Base {
     vm.assume(_selector != _UPGRADE_TO_SELECTOR && _selector != _UPGRADE_TO_AND_CALL_SELECTOR);
 
     // Mock calls
-    vm.mockCall(_usdc, _data, abi.encode(true, ''));
+    vm.mockCall(_eurc, _data, abi.encode(true, ''));
 
     // Expect events
     vm.expectEmit(true, true, true, true);
-    emit USDCFunctionSent(bytes4(_data));
+    emit EURCFunctionSent(bytes4(_data));
 
     // Execute
     vm.prank(_owner);
-    adapter.callUsdcTransaction(_data);
+    adapter.callEurcTransaction(_data);
   }
 }
 
-contract L2OpUSDCBridgeAdapter_Unit_Initialize is Base {
+contract L2OpEURCBridgeAdapter_Unit_Initialize is Base {
   /**
    * @notice Check that the initialize function works as expected
    * @dev Needs to be checked on the proxy since the initialize function is disabled on the implementation
@@ -1133,8 +1133,8 @@ contract L2OpUSDCBridgeAdapter_Unit_Initialize is Base {
     vm.assume(_owner != address(0));
 
     // Deploy a proxy contract setting the , and call the initialize function on it to set the owner
-    ForTestL2OpUSDCBridgeAdapter _newAdapter = ForTestL2OpUSDCBridgeAdapter(
-      address(new ERC1967Proxy(address(_adapterImpl), abi.encodeCall(OpUSDCBridgeAdapter.initialize, _owner)))
+    ForTestL2OpEURCBridgeAdapter _newAdapter = ForTestL2OpEURCBridgeAdapter(
+      address(new ERC1967Proxy(address(_adapterImpl), abi.encodeCall(OpEURCBridgeAdapter.initialize, _owner)))
     );
 
     // Assert

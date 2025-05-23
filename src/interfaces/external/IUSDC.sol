@@ -3,9 +3,9 @@ pragma solidity 0.8.25;
 
 import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 
-interface IUSDC is IERC20 {
+interface IEURC is IERC20 {
   /**
-   * @notice Mints USDC tokens
+   * @notice Mints EURC tokens
    * @param _to Address to mint tokens to
    * @param _amount Amount of tokens to mint
    */
@@ -20,7 +20,7 @@ interface IUSDC is IERC20 {
   function burn(uint256 _amount) external;
 
   /**
-   * @notice Transfers USDC ownership  to another address
+   * @notice Transfers EURC ownership  to another address
    * @param _newOwner Address to transfer ownership to
    */
   function transferOwnership(address _newOwner) external;
@@ -111,13 +111,13 @@ interface IUSDC is IERC20 {
   function unBlacklist(address _account) external;
 
   /**
-   * @notice Function to upgrade the usdc proxy to a new implementation
+   * @notice Function to upgrade the eurc proxy to a new implementation
    * @param _newImplementation Address of the new implementation
    */
   function upgradeTo(address _newImplementation) external;
 
   /**
-   * @notice Upgrades the USDC proxy to a new implementation and calls a function on the new implementation
+   * @notice Upgrades the EURC proxy to a new implementation and calls a function on the new implementation
    * @param _newImplementation Address of the new implementation
    * @param _data Data to call on the new implementation
    */

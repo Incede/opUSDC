@@ -4,17 +4,17 @@ pragma solidity 0.8.25;
 import {OwnableUpgradeable} from '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
 import {ERC1967Proxy} from '@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol';
 import {MessageHashUtils} from '@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol';
-import {OpUSDCBridgeAdapter} from 'contracts/universal/OpUSDCBridgeAdapter.sol';
+import {OpEURCBridgeAdapter} from 'contracts/universal/OpEURCBridgeAdapter.sol';
 import {Test} from 'forge-std/Test.sol';
-import {IOpUSDCBridgeAdapter} from 'interfaces/IOpUSDCBridgeAdapter.sol';
+import {IOpEURCBridgeAdapter} from 'interfaces/IOpEURCBridgeAdapter.sol';
 import {SigUtils} from 'test/utils/SigUtils.sol';
 
-contract ForTestOpUSDCBridgeAdapter is OpUSDCBridgeAdapter {
+contract ForTestOpEURCBridgeAdapter is OpEURCBridgeAdapter {
   constructor(
-    address _usdc,
+    address _eurc,
     address _messenger,
     address _linkedAdapter
-  ) OpUSDCBridgeAdapter(_usdc, _messenger, _linkedAdapter) {}
+  ) OpEURCBridgeAdapter(_eurc, _messenger, _linkedAdapter) {}
 
   function receiveMessage(address _user, address _spender, uint256 _amount) external override {}
 
@@ -42,9 +42,9 @@ contract ForTestOpUSDCBridgeAdapter is OpUSDCBridgeAdapter {
 }
 
 abstract contract Base is Test {
-  ForTestOpUSDCBridgeAdapter public adapter;
+  ForTestOpEURCBridgeAdapter public adapter;
 
-  address internal _usdc = makeAddr('opUSDC');
+  address internal _eurc = makeAddr('opEURC');
   address internal _owner = makeAddr('owner');
   address internal _linkedAdapter = makeAddr('linkedAdapter');
   address internal _messenger = makeAddr('messenger');
@@ -56,25 +56,25 @@ abstract contract Base is Test {
 
   function setUp() public virtual {
     (_signerAd, _signerPk) = makeAddrAndKey('signer');
-    _adapterImpl = address(new ForTestOpUSDCBridgeAdapter(_usdc, _messenger, _linkedAdapter));
-    adapter = ForTestOpUSDCBridgeAdapter(
-      address(new ERC1967Proxy(_adapterImpl, abi.encodeCall(OpUSDCBridgeAdapter.initialize, _owner)))
+    _adapterImpl = address(new ForTestOpEURCBridgeAdapter(_eurc, _messenger, _linkedAdapter));
+    adapter = ForTestOpEURCBridgeAdapter(
+      address(new ERC1967Proxy(_adapterImpl, abi.encodeCall(OpEURCBridgeAdapter.initialize, _owner)))
     );
   }
 }
 
-contract OpUSDCBridgeAdapter_Unit_Constructor is Base {
+contract OpEURCBridgeAdapter_Unit_Constructor is Base {
   /**
    * @notice Check that the constructor works as expected
    */
   function test_constructorParams() public view {
-    assertEq(adapter.USDC(), _usdc, 'USDC should be set to the provided address');
+    assertEq(adapter.EURC(), _eurc, 'EURC should be set to the provided address');
     assertEq(adapter.MESSENGER(), _messenger, 'Messenger should be set to the provided address');
     assertEq(adapter.LINKED_ADAPTER(), _linkedAdapter, 'Linked adapter should be set to the provided address');
   }
 }
 
-contract OpUSDCBridgeAdapter_Unit_SendMessage is Base {
+contract OpEURCBridgeAdapter_Unit_SendMessage is Base {
   /**
    * @notice Execute vitual function to get 100% coverage
    */
@@ -84,7 +84,7 @@ contract OpUSDCBridgeAdapter_Unit_SendMessage is Base {
   }
 }
 
-contract OpUSDCBridgeAdapter_Unit_SendMessageWithSignature is Base {
+contract OpEURCBridgeAdapter_Unit_SendMessageWithSignature is Base {
   /**
    * @notice Execute vitual function to get 100% coverage
    */
@@ -94,7 +94,7 @@ contract OpUSDCBridgeAdapter_Unit_SendMessageWithSignature is Base {
   }
 }
 
-contract ForTestOpUSDCBridgeAdapter_Unit_ReceiveMessage is Base {
+contract ForTestOpEURCBridgeAdapter_Unit_ReceiveMessage is Base {
   /**
    * @notice Execute vitual function to get 100% coverage
    */
@@ -104,7 +104,7 @@ contract ForTestOpUSDCBridgeAdapter_Unit_ReceiveMessage is Base {
   }
 }
 
-contract OpUSDCBridgeAdapter_Unit_CancelSignature is Base {
+contract OpEURCBridgeAdapter_Unit_CancelSignature is Base {
   event NonceCanceled(address _caller, uint256 _nonce);
 
   function test_setNonceAsUsed(address _caller, uint256 _nonce) public {
@@ -128,11 +128,11 @@ contract OpUSDCBridgeAdapter_Unit_CancelSignature is Base {
   }
 }
 
-contract OpUSDCBridgeAdapter_Unit_CheckSignature is Base {
+contract OpEURCBridgeAdapter_Unit_CheckSignature is Base {
   /**
    * @notice Check that the signature is valid
    */
-  function test_validSignature(IOpUSDCBridgeAdapter.BridgeMessage memory _message) public {
+  function test_validSignature(IOpEURCBridgeAdapter.BridgeMessage memory _message) public {
     SigUtils _sigUtils = new SigUtils(address(adapter), '', '');
 
     vm.startPrank(_signerAd);
@@ -157,12 +157,12 @@ contract OpUSDCBridgeAdapter_Unit_CheckSignature is Base {
     bytes memory _signature = abi.encodePacked(r, s, v);
 
     // Execute
-    vm.expectRevert(abi.encodeWithSelector(IOpUSDCBridgeAdapter.IOpUSDCBridgeAdapter_InvalidSignature.selector));
+    vm.expectRevert(abi.encodeWithSelector(IOpEURCBridgeAdapter.IOpEURCBridgeAdapter_InvalidSignature.selector));
     adapter.forTest_checkSignature(_signerAd, _hashedMessage, _signature);
   }
 }
 
-contract OpUSDCBridgeAdapter_Unit_AuthorizeUpgrade is Base {
+contract OpEURCBridgeAdapter_Unit_AuthorizeUpgrade is Base {
   /**
    * @notice Check that the function reverts if the caller is not the owner
    */

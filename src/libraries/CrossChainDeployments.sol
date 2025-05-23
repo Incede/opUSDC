@@ -1,6 +1,6 @@
 pragma solidity 0.8.25;
 
-import {L2OpUSDCDeploy} from 'contracts/L2OpUSDCDeploy.sol';
+import {L2OpEURCDeploy} from 'contracts/L2OpEURCDeploy.sol';
 import {ICreate2Deployer} from 'interfaces/external/ICreate2Deployer.sol';
 import {ICrossDomainMessenger} from 'interfaces/external/ICrossDomainMessenger.sol';
 import {IOptimismPortal} from 'interfaces/external/IOptimismPortal.sol';
@@ -36,7 +36,7 @@ library CrossChainDeployments {
     address _create2Deployer,
     uint32 _minGasLimit
   ) external returns (address _l2Deploy) {
-    bytes memory _l2DeployInitCode = bytes.concat(type(L2OpUSDCDeploy).creationCode, _args);
+    bytes memory _l2DeployInitCode = bytes.concat(type(L2OpEURCDeploy).creationCode, _args);
     _l2Deploy = precalculateCreate2Address(_salt, keccak256(_l2DeployInitCode), _create2Deployer);
 
     bytes memory _l2DeploymentsTx = abi.encodeCall(ICreate2Deployer.deploy, (_VALUE, _salt, _l2DeployInitCode));

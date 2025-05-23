@@ -6,10 +6,10 @@ import {UUPSUpgradeable} from '@openzeppelin/contracts-upgradeable/proxy/utils/U
 import {EIP712Upgradeable} from '@openzeppelin/contracts-upgradeable/utils/cryptography/EIP712Upgradeable.sol';
 import {MessageHashUtils} from '@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol';
 import {SignatureChecker} from '@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol';
-import {IOpUSDCBridgeAdapter} from 'interfaces/IOpUSDCBridgeAdapter.sol';
+import {IOpEURCBridgeAdapter} from 'interfaces/IOpEURCBridgeAdapter.sol';
 import {ICrossDomainMessenger} from 'interfaces/external/ICrossDomainMessenger.sol';
 
-abstract contract OpUSDCBridgeAdapter is UUPSUpgradeable, OwnableUpgradeable, EIP712Upgradeable, IOpUSDCBridgeAdapter {
+abstract contract OpEURCBridgeAdapter is UUPSUpgradeable, OwnableUpgradeable, EIP712Upgradeable, IOpEURCBridgeAdapter {
   using MessageHashUtils for bytes32;
   using SignatureChecker for address;
 
@@ -17,22 +17,22 @@ abstract contract OpUSDCBridgeAdapter is UUPSUpgradeable, OwnableUpgradeable, EI
   bytes32 public constant BRIDGE_MESSAGE_TYPEHASH =
     keccak256('BridgeMessage(address to,uint256 amount,uint256 deadline,uint256 nonce,uint32 minGasLimit)');
 
-  /// @inheritdoc IOpUSDCBridgeAdapter
-  address public immutable USDC;
+  /// @inheritdoc IOpEURCBridgeAdapter
+  address public immutable EURC;
 
-  /// @inheritdoc IOpUSDCBridgeAdapter
+  /// @inheritdoc IOpEURCBridgeAdapter
   address public immutable LINKED_ADAPTER;
 
-  /// @inheritdoc IOpUSDCBridgeAdapter
+  /// @inheritdoc IOpEURCBridgeAdapter
   address public immutable MESSENGER;
 
-  /// @inheritdoc IOpUSDCBridgeAdapter
+  /// @inheritdoc IOpEURCBridgeAdapter
   Status public messengerStatus;
 
-  /// @inheritdoc IOpUSDCBridgeAdapter
+  /// @inheritdoc IOpEURCBridgeAdapter
   mapping(address _user => mapping(uint256 _nonce => bool _used)) public userNonces;
 
-  /// @inheritdoc IOpUSDCBridgeAdapter
+  /// @inheritdoc IOpEURCBridgeAdapter
   mapping(address _spender => mapping(address _user => uint256 _lockedAmount)) public lockedFundsDetails;
 
   /// @notice Reserve 50 storage slots to be safe on future upgrades
@@ -43,20 +43,20 @@ abstract contract OpUSDCBridgeAdapter is UUPSUpgradeable, OwnableUpgradeable, EI
    */
   modifier onlyLinkedAdapter() {
     if (msg.sender != MESSENGER || ICrossDomainMessenger(MESSENGER).xDomainMessageSender() != LINKED_ADAPTER) {
-      revert IOpUSDCBridgeAdapter_InvalidSender();
+      revert IOpEURCBridgeAdapter_InvalidSender();
     }
     _;
   }
 
   /**
-   * @notice Construct the OpUSDCBridgeAdapter contract
-   * @param _usdc The address of the USDC Contract to be used by the adapter
+   * @notice Construct the OpEURCBridgeAdapter contract
+   * @param _eurc The address of the EURC Contract to be used by the adapter
    * @param _messenger The address of the messenger contract
    * @param _linkedAdapter The address of the linked adapter
    */
   // solhint-disable-next-line no-unused-vars
-  constructor(address _usdc, address _messenger, address _linkedAdapter) {
-    USDC = _usdc;
+  constructor(address _eurc, address _messenger, address _linkedAdapter) {
+    EURC = _eurc;
     MESSENGER = _messenger;
     LINKED_ADAPTER = _linkedAdapter;
     _disableInitializers();
@@ -141,7 +141,7 @@ abstract contract OpUSDCBridgeAdapter is UUPSUpgradeable, OwnableUpgradeable, EI
     // Uses the EIP712Upgradeable typed data hash
     _messageHash = _hashTypedDataV4(_messageHash);
 
-    if (!_signer.isValidSignatureNow(_messageHash, _signature)) revert IOpUSDCBridgeAdapter_InvalidSignature();
+    if (!_signer.isValidSignatureNow(_messageHash, _signature)) revert IOpEURCBridgeAdapter_InvalidSignature();
   }
 
   /**

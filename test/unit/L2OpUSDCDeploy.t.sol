@@ -3,39 +3,39 @@ pragma solidity 0.8.25;
 
 import {Ownable} from '@openzeppelin/contracts/access/Ownable.sol';
 import {ERC1967Utils} from '@openzeppelin/contracts/proxy/ERC1967/ERC1967Utils.sol';
-import {L2OpUSDCDeploy} from 'contracts/L2OpUSDCDeploy.sol';
-import {USDC_PROXY_CREATION_CODE} from 'contracts/utils/USDCProxyCreationCode.sol';
+import {L2OpEURCDeploy} from 'contracts/L2OpEURCDeploy.sol';
+import {EURC_PROXY_CREATION_CODE} from 'contracts/utils/EURCProxyCreationCode.sol';
 import {Test} from 'forge-std/Test.sol';
-import {IL2OpUSDCDeploy} from 'interfaces/IL2OpUSDCDeploy.sol';
-import {IOpUSDCBridgeAdapter} from 'interfaces/IOpUSDCBridgeAdapter.sol';
-import {IUSDC} from 'interfaces/external/IUSDC.sol';
+import {IL2OpEURCDeploy} from 'interfaces/IL2OpEURCDeploy.sol';
+import {IOpEURCBridgeAdapter} from 'interfaces/IOpEURCBridgeAdapter.sol';
+import {IEURC} from 'interfaces/external/IEURC.sol';
 import {Helpers} from 'test/utils/Helpers.sol';
 
-contract L2OpUSDCDeployForTest is L2OpUSDCDeploy {
+contract L2OpEURCDeployForTest is L2OpEURCDeploy {
   constructor(
     address _l1Adapter,
     address _l2AdapterOwner,
-    address _usdcImplAddr,
-    USDCInitializeData memory _usdcInitializeData,
-    bytes[] memory _usdcInitTxs
-  ) L2OpUSDCDeploy(_l1Adapter, _l2AdapterOwner, _usdcImplAddr, _usdcInitializeData, _usdcInitTxs) {}
+    address _eurcImplAddr,
+    EURCInitializeData memory _eurcInitializeData,
+    bytes[] memory _eurcInitTxs
+  ) L2OpEURCDeploy(_l1Adapter, _l2AdapterOwner, _eurcImplAddr, _eurcInitializeData, _eurcInitTxs) {}
 
   function forTest_deployCreate(bytes memory _initCode) public returns (address _newContract) {
     _newContract = _deployCreate(_initCode);
   }
 
   function forTest_executeInitTxs(
-    address _usdc,
-    USDCInitializeData memory _usdcInitializeData,
+    address _eurc,
+    EURCInitializeData memory _eurcInitializeData,
     address _l2Adapter,
     bytes[] memory _initTxs
   ) public {
-    _executeInitTxs(_usdc, _usdcInitializeData, _l2Adapter, _initTxs);
+    _executeInitTxs(_eurc, _eurcInitializeData, _l2Adapter, _initTxs);
   }
 }
 
 contract Base is Test, Helpers {
-  L2OpUSDCDeployForTest public factory;
+  L2OpEURCDeployForTest public factory;
 
   address internal _l2Messenger = 0x4200000000000000000000000000000000000007;
   address internal _l1Factory = makeAddr('l1Factory');
@@ -43,39 +43,39 @@ contract Base is Test, Helpers {
   address internal _create2Deployer = makeAddr('create2Deployer');
   address internal _l1Adapter = makeAddr('l1Adapter');
   address internal _l2AdapterOwner = makeAddr('l2AdapterOwner');
-  address internal _usdcImplAddr = makeAddr('usdcImpl');
-  uint256 internal _usdcProxyDeploymentNonce = 1;
+  address internal _eurcImplAddr = makeAddr('eurcImpl');
+  uint256 internal _eurcProxyDeploymentNonce = 1;
   uint256 internal _l2AdapterDeploymentNonce = 3;
 
   address internal _dummyContract;
 
-  IL2OpUSDCDeploy.USDCInitializeData internal _usdcInitializeData;
+  IL2OpEURCDeploy.EURCInitializeData internal _eurcInitializeData;
   bytes[] internal _emptyInitTxs;
-  bytes[] internal _initTxsUsdc;
+  bytes[] internal _initTxsEurc;
   bytes[] internal _badInitTxs;
 
   function setUp() public virtual {
     // Precalculate the factory address. The real create 2 deployer will do it through `CREATE2`, but we'll use `CREATE`
     // just for scope of the unit tests
     uint256 _deployerNonce = vm.getNonce(_create2Deployer);
-    factory = L2OpUSDCDeployForTest(_precalculateCreateAddress(_create2Deployer, _deployerNonce));
+    factory = L2OpEURCDeployForTest(_precalculateCreateAddress(_create2Deployer, _deployerNonce));
 
     // Set the initialize data
-    _usdcInitializeData = IL2OpUSDCDeploy.USDCInitializeData({
+    _eurcInitializeData = IL2OpEURCDeploy.EURCInitializeData({
       tokenName: 'USD Coin',
-      tokenSymbol: 'USDC',
+      tokenSymbol: 'EURC',
       tokenCurrency: 'USD',
       tokenDecimals: 6
     });
 
-    // Set the init txs for the USDC implementation contract (DummyContract)
+    // Set the init txs for the EURC implementation contract (DummyContract)
     bytes memory _initTxOne = abi.encodeWithSignature('returnTrue()');
     bytes memory _initTxTwo = abi.encodeWithSignature('returnFalse()');
     bytes memory _initTxThree = abi.encodeWithSignature('returnOne()');
-    _initTxsUsdc = new bytes[](3);
-    _initTxsUsdc[0] = _initTxOne;
-    _initTxsUsdc[1] = _initTxTwo;
-    _initTxsUsdc[2] = _initTxThree;
+    _initTxsEurc = new bytes[](3);
+    _initTxsEurc[0] = _initTxOne;
+    _initTxsEurc[1] = _initTxTwo;
+    _initTxsEurc[2] = _initTxThree;
 
     // Set the bad init transaction to test when the initialization fails
     bytes memory _badInitTx = abi.encodeWithSignature('nonExistentFunction()');
@@ -83,37 +83,37 @@ contract Base is Test, Helpers {
     _badInitTxs[0] = '';
     _badInitTxs[1] = _badInitTx;
 
-    vm.etch(_usdcImplAddr, type(ForTestDummyContract).runtimeCode);
+    vm.etch(_eurcImplAddr, type(ForTestDummyContract).runtimeCode);
   }
 }
 
-contract L2OpUSDCDeploy_Unit_Constructor is Base {
+contract L2OpEURCDeploy_Unit_Constructor is Base {
   using ERC1967Utils for address;
 
-  event USDCImplementationDeployed(address _l2UsdcImplementation);
-  event USDCProxyDeployed(address _l2UsdcProxy);
+  event EURCImplementationDeployed(address _l2EurcImplementation);
+  event EURCProxyDeployed(address _l2EurcProxy);
   event L2AdapterDeployed(address _l2Adapter);
 
   /**
    * @notice Check the deployment of the L2 adapter implementation and proxy is properly done by checking the emitted
    * event and the implementation length
-   * @dev Assuming the USDC proxy correctly sets the implementation address to check it was properly deployed
+   * @dev Assuming the EURC proxy correctly sets the implementation address to check it was properly deployed
    */
-  function test_deployUsdcProxy() public {
-    // Calculate the usdc proxy address
-    address _usdcProxy = _precalculateCreateAddress(address(factory), _usdcProxyDeploymentNonce);
+  function test_deployEurcProxy() public {
+    // Calculate the eurc proxy address
+    address _eurcProxy = _precalculateCreateAddress(address(factory), _eurcProxyDeploymentNonce);
 
-    // Expect the USDC proxy deployment event to be properly emitted
+    // Expect the EURC proxy deployment event to be properly emitted
     vm.expectEmit(true, true, true, true);
-    emit USDCProxyDeployed(_usdcProxy);
+    emit EURCProxyDeployed(_eurcProxy);
 
     // Execute
     vm.prank(_create2Deployer);
-    new L2OpUSDCDeploy(_l1Adapter, _l2AdapterOwner, _usdcImplAddr, _usdcInitializeData, _emptyInitTxs);
+    new L2OpEURCDeploy(_l1Adapter, _l2AdapterOwner, _eurcImplAddr, _eurcInitializeData, _emptyInitTxs);
 
-    // Assert the USDC proxy was deployed
-    assertGt(_usdcProxy.code.length, 0, 'USDC proxy was not deployed');
-    assertEq(IUSDC(_usdcProxy).implementation(), _usdcImplAddr, 'USDC implementation was not set');
+    // Assert the EURC proxy was deployed
+    assertGt(_eurcProxy.code.length, 0, 'EURC proxy was not deployed');
+    assertEq(IEURC(_eurcProxy).implementation(), _eurcImplAddr, 'EURC implementation was not set');
   }
 
   /**
@@ -122,8 +122,8 @@ contract L2OpUSDCDeploy_Unit_Constructor is Base {
    * @dev Assuming the adapter correctly sets the immutables to check the constructor values were properly set
    */
   function test_deployAdapter() public {
-    // Calculate the usdc proxy address
-    address _usdcProxy = _precalculateCreateAddress(address(factory), _usdcProxyDeploymentNonce);
+    // Calculate the eurc proxy address
+    address _eurcProxy = _precalculateCreateAddress(address(factory), _eurcProxyDeploymentNonce);
 
     // Calculate the l2 adapter proxy address
     address _l2AdapterProxy = _precalculateCreateAddress(address(factory), _l2AdapterDeploymentNonce);
@@ -134,23 +134,23 @@ contract L2OpUSDCDeploy_Unit_Constructor is Base {
 
     // Execute
     vm.prank(_create2Deployer);
-    new L2OpUSDCDeploy(_l1Adapter, _l2AdapterOwner, _usdcImplAddr, _usdcInitializeData, _emptyInitTxs);
+    new L2OpEURCDeploy(_l1Adapter, _l2AdapterOwner, _eurcImplAddr, _eurcInitializeData, _emptyInitTxs);
 
     // Assert the adapter was deployed
     assertGt(_l2AdapterProxy.code.length, 0, 'L2 adapter was not deployed');
     // Check the constructor values were properly passed
-    assertEq(IOpUSDCBridgeAdapter(_l2AdapterProxy).USDC(), _usdcProxy, 'USDC proxy was not set');
-    assertEq(IOpUSDCBridgeAdapter(_l2AdapterProxy).MESSENGER(), _l2Messenger, 'L2 messenger was not set');
-    assertEq(IOpUSDCBridgeAdapter(_l2AdapterProxy).LINKED_ADAPTER(), _l1Adapter, 'L1 factory was not set');
+    assertEq(IOpEURCBridgeAdapter(_l2AdapterProxy).EURC(), _eurcProxy, 'EURC proxy was not set');
+    assertEq(IOpEURCBridgeAdapter(_l2AdapterProxy).MESSENGER(), _l2Messenger, 'L2 messenger was not set');
+    assertEq(IOpEURCBridgeAdapter(_l2AdapterProxy).LINKED_ADAPTER(), _l1Adapter, 'L1 factory was not set');
     assertEq(Ownable(_l2AdapterProxy).owner(), _l2AdapterOwner, 'L2 adapter owner was not set');
   }
 
   /**
-   * @notice Check the `changeAdmin` function is called on the USDC proxy with the proper fallback proxy admin address
+   * @notice Check the `changeAdmin` function is called on the EURC proxy with the proper fallback proxy admin address
    */
   function test_callChangeAdminWithFallbackProxy() public {
-    // Calculate the usdc proxy address
-    address _usdcProxy = _precalculateCreateAddress(address(factory), _usdcProxyDeploymentNonce);
+    // Calculate the eurc proxy address
+    address _eurcProxy = _precalculateCreateAddress(address(factory), _eurcProxyDeploymentNonce);
 
     // Calculate the l2 adapter address
     address _l2Adapter = _precalculateCreateAddress(address(factory), _l2AdapterDeploymentNonce);
@@ -160,32 +160,32 @@ contract L2OpUSDCDeploy_Unit_Constructor is Base {
     address _fallbackProxyAdmin = _precalculateCreateAddress(_l2Adapter, _fallbackProxyAdminNonce);
 
     // Expect the call over 'changeAdmin' function
-    vm.expectCall(_usdcProxy, abi.encodeWithSelector(IUSDC.changeAdmin.selector, _fallbackProxyAdmin));
+    vm.expectCall(_eurcProxy, abi.encodeWithSelector(IEURC.changeAdmin.selector, _fallbackProxyAdmin));
 
     // Execute
     vm.prank(_create2Deployer);
-    new L2OpUSDCDeploy(_l1Adapter, _l2AdapterOwner, _usdcImplAddr, _usdcInitializeData, _emptyInitTxs);
+    new L2OpEURCDeploy(_l1Adapter, _l2AdapterOwner, _eurcImplAddr, _eurcInitializeData, _emptyInitTxs);
   }
 
   /**
    * @notice Check init txs are properly executed over the L2 adapter implementation and proxy, and that the
    * `changeAdmin` function is called on it too.
    */
-  function test_executeUsdcProxyInitTxs() public {
-    // Calculate the usdc proxy address
-    address _usdcProxy = _precalculateCreateAddress(address(factory), _usdcProxyDeploymentNonce);
+  function test_executeEurcProxyInitTxs() public {
+    // Calculate the eurc proxy address
+    address _eurcProxy = _precalculateCreateAddress(address(factory), _eurcProxyDeploymentNonce);
 
     // Expect the init txs to be called
-    vm.expectCall(_usdcProxy, _initTxsUsdc[0]);
-    vm.expectCall(_usdcProxy, _initTxsUsdc[1]);
+    vm.expectCall(_eurcProxy, _initTxsEurc[0]);
+    vm.expectCall(_eurcProxy, _initTxsEurc[1]);
 
     // Execute
     vm.prank(_create2Deployer);
-    new L2OpUSDCDeploy(_l1Adapter, _l2AdapterOwner, _usdcImplAddr, _usdcInitializeData, _initTxsUsdc);
+    new L2OpEURCDeploy(_l1Adapter, _l2AdapterOwner, _eurcImplAddr, _eurcInitializeData, _initTxsEurc);
   }
 }
 
-contract L2OpUSDCDeploy_Unit_ExecuteInitTxs is Base {
+contract L2OpEURCDeploy_Unit_ExecuteInitTxs is Base {
   /**
    * @notice Deploy the factory to test the internal function
    */
@@ -193,7 +193,7 @@ contract L2OpUSDCDeploy_Unit_ExecuteInitTxs is Base {
     super.setUp();
 
     vm.prank(_create2Deployer);
-    new L2OpUSDCDeployForTest(_l1Adapter, _l2AdapterOwner, _usdcImplAddr, _usdcInitializeData, _emptyInitTxs);
+    new L2OpEURCDeployForTest(_l1Adapter, _l2AdapterOwner, _eurcImplAddr, _eurcInitializeData, _emptyInitTxs);
   }
 
   /**
@@ -207,11 +207,11 @@ contract L2OpUSDCDeploy_Unit_ExecuteInitTxs is Base {
     vm.expectCall(
       address(factory),
       abi.encodeWithSelector(
-        IUSDC.initialize.selector,
-        _usdcInitializeData.tokenName,
-        _usdcInitializeData.tokenSymbol,
-        _usdcInitializeData.tokenCurrency,
-        _usdcInitializeData.tokenDecimals,
+        IEURC.initialize.selector,
+        _eurcInitializeData.tokenName,
+        _eurcInitializeData.tokenSymbol,
+        _eurcInitializeData.tokenCurrency,
+        _eurcInitializeData.tokenDecimals,
         address(factory),
         _l2Adapter,
         _l2Adapter,
@@ -220,7 +220,7 @@ contract L2OpUSDCDeploy_Unit_ExecuteInitTxs is Base {
     );
 
     // Execute
-    factory.forTest_executeInitTxs(address(factory), _usdcInitializeData, _l2Adapter, _emptyInitTxs);
+    factory.forTest_executeInitTxs(address(factory), _eurcInitializeData, _l2Adapter, _emptyInitTxs);
   }
 
   /**
@@ -233,11 +233,11 @@ contract L2OpUSDCDeploy_Unit_ExecuteInitTxs is Base {
     // Expect `configureMinter` to be properly called
     // solhint-disable-next-line max-line-length
     vm.expectCall(
-      address(factory), abi.encodeWithSelector(IUSDC.configureMinter.selector, _l2Adapter, type(uint256).max)
+      address(factory), abi.encodeWithSelector(IEURC.configureMinter.selector, _l2Adapter, type(uint256).max)
     );
 
     // Execute
-    factory.forTest_executeInitTxs(address(factory), _usdcInitializeData, _l2Adapter, _emptyInitTxs);
+    factory.forTest_executeInitTxs(address(factory), _eurcInitializeData, _l2Adapter, _emptyInitTxs);
   }
 
   /**
@@ -248,10 +248,10 @@ contract L2OpUSDCDeploy_Unit_ExecuteInitTxs is Base {
     _mockExecuteTxsCalls();
 
     // Expect `updateMasterMinter` to be properly called
-    vm.expectCall(address(factory), abi.encodeWithSelector(IUSDC.updateMasterMinter.selector, _l2Adapter));
+    vm.expectCall(address(factory), abi.encodeWithSelector(IEURC.updateMasterMinter.selector, _l2Adapter));
 
     // Execute
-    factory.forTest_executeInitTxs(address(factory), _usdcInitializeData, _l2Adapter, _emptyInitTxs);
+    factory.forTest_executeInitTxs(address(factory), _eurcInitializeData, _l2Adapter, _emptyInitTxs);
   }
 
   /**
@@ -262,10 +262,10 @@ contract L2OpUSDCDeploy_Unit_ExecuteInitTxs is Base {
     _mockExecuteTxsCalls();
 
     // Expect `transferOwnership` to be properly called
-    vm.expectCall(address(factory), abi.encodeWithSelector(IUSDC.transferOwnership.selector, _l2Adapter));
+    vm.expectCall(address(factory), abi.encodeWithSelector(IEURC.transferOwnership.selector, _l2Adapter));
 
     // Execute
-    factory.forTest_executeInitTxs(address(factory), _usdcInitializeData, _l2Adapter, _emptyInitTxs);
+    factory.forTest_executeInitTxs(address(factory), _eurcInitializeData, _l2Adapter, _emptyInitTxs);
   }
 
   /**
@@ -275,12 +275,12 @@ contract L2OpUSDCDeploy_Unit_ExecuteInitTxs is Base {
     _mockExecuteTxsCalls();
 
     // Mock the call to the target contract
-    _mockAndExpect(address(factory), _initTxsUsdc[0], '');
-    _mockAndExpect(address(factory), _initTxsUsdc[1], '');
-    _mockAndExpect(address(factory), _initTxsUsdc[2], '');
+    _mockAndExpect(address(factory), _initTxsEurc[0], '');
+    _mockAndExpect(address(factory), _initTxsEurc[1], '');
+    _mockAndExpect(address(factory), _initTxsEurc[2], '');
 
     // Execute the initialization transactions
-    factory.forTest_executeInitTxs(address(factory), _usdcInitializeData, _l2Adapter, _initTxsUsdc);
+    factory.forTest_executeInitTxs(address(factory), _eurcInitializeData, _l2Adapter, _initTxsEurc);
   }
 
   /**
@@ -289,7 +289,7 @@ contract L2OpUSDCDeploy_Unit_ExecuteInitTxs is Base {
   function test_revertIfInitTxsOnArrayFail(address _l2Adapter) public {
     _mockExecuteTxsCalls();
 
-    bytes[] memory _badInitTxs = _initTxsUsdc;
+    bytes[] memory _badInitTxs = _initTxsEurc;
     for (uint256 _i; _i < _badInitTxs.length; _i++) {
       // Mock the calls
       vm.mockCall(address(factory), _badInitTxs[0], abi.encode(true));
@@ -300,28 +300,28 @@ contract L2OpUSDCDeploy_Unit_ExecuteInitTxs is Base {
       vm.mockCallRevert(address(factory), _badInitTxs[_i], '');
 
       // Expect it to revert with the right index as argument
-      vm.expectRevert(abi.encodeWithSelector(IL2OpUSDCDeploy.IL2OpUSDCDeploy_InitializationFailed.selector, _i + 1));
+      vm.expectRevert(abi.encodeWithSelector(IL2OpEURCDeploy.IL2OpEURCDeploy_InitializationFailed.selector, _i + 1));
       // Execute
-      factory.forTest_executeInitTxs(address(factory), _usdcInitializeData, _l2Adapter, _badInitTxs);
+      factory.forTest_executeInitTxs(address(factory), _eurcInitializeData, _l2Adapter, _badInitTxs);
     }
   }
 
   function _mockExecuteTxsCalls() internal {
     // Mock call over `initialize()` function
-    vm.mockCall(address(factory), abi.encodeWithSelector(IUSDC.initialize.selector), '');
+    vm.mockCall(address(factory), abi.encodeWithSelector(IEURC.initialize.selector), '');
 
     // Mock the call over `configureMinter()` function
-    vm.mockCall(address(factory), abi.encodeWithSelector(IUSDC.configureMinter.selector), abi.encode(true));
+    vm.mockCall(address(factory), abi.encodeWithSelector(IEURC.configureMinter.selector), abi.encode(true));
 
     // Mock the call over `updateMasterMinter()` function
-    vm.mockCall(address(factory), abi.encodeWithSelector(IUSDC.updateMasterMinter.selector), '');
+    vm.mockCall(address(factory), abi.encodeWithSelector(IEURC.updateMasterMinter.selector), '');
 
     // Mock the call over `transferOwnership()` function
-    vm.mockCall(address(factory), abi.encodeWithSelector(IUSDC.transferOwnership.selector), '');
+    vm.mockCall(address(factory), abi.encodeWithSelector(IEURC.transferOwnership.selector), '');
   }
 }
 
-contract L2OpUSDCDeploy_Unit_DeployCreate is Base {
+contract L2OpEURCDeploy_Unit_DeployCreate is Base {
   /**
    * @notice Deploy the factory to test the internal function
    */
@@ -329,15 +329,15 @@ contract L2OpUSDCDeploy_Unit_DeployCreate is Base {
     super.setUp();
 
     vm.prank(_create2Deployer);
-    new L2OpUSDCDeployForTest(_l1Adapter, _l2AdapterOwner, _usdcImplAddr, _usdcInitializeData, _emptyInitTxs);
+    new L2OpEURCDeployForTest(_l1Adapter, _l2AdapterOwner, _eurcImplAddr, _eurcInitializeData, _emptyInitTxs);
   }
 
   /**
    * @notice Check the deployment of a contract using the `CREATE2` opcode is properly done to the expected addrtess
    */
   function test_deployCreate() public {
-    // Get the init code with the USDC proxy creation code plus the USDC implementation address
-    bytes memory _initCode = bytes.concat(USDC_PROXY_CREATION_CODE, abi.encode(address(factory)));
+    // Get the init code with the EURC proxy creation code plus the EURC implementation address
+    bytes memory _initCode = bytes.concat(EURC_PROXY_CREATION_CODE, abi.encode(address(factory)));
 
     // Precalculate the address of the contract that will be deployed with the current factory's nonce
     uint256 _deploymentNonce = vm.getNonce(address(factory));
@@ -359,7 +359,7 @@ contract L2OpUSDCDeploy_Unit_DeployCreate is Base {
     bytes memory _badInitCode = '0x0000405060';
 
     // Expect the tx to revert
-    vm.expectRevert(IL2OpUSDCDeploy.IL2OpUSDCDeploy_DeploymentFailed.selector);
+    vm.expectRevert(IL2OpEURCDeploy.IL2OpEURCDeploy_DeploymentFailed.selector);
 
     // Execute
     factory.forTest_deployCreate(_badInitCode);

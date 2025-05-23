@@ -3,35 +3,35 @@ pragma solidity 0.8.25;
 
 import {HalmosTest} from '../AdvancedTestsUtils.sol';
 import {ERC1967Proxy} from '@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol';
-import {L1OpUSDCBridgeAdapter} from 'contracts/L1OpUSDCBridgeAdapter.sol';
-import {L1OpUSDCFactory} from 'contracts/L1OpUSDCFactory.sol';
-import {L2OpUSDCBridgeAdapter} from 'contracts/L2OpUSDCBridgeAdapter.sol';
-import {L2OpUSDCDeploy} from 'contracts/L2OpUSDCDeploy.sol';
-import {USDC_PROXY_CREATION_CODE} from 'contracts/utils/USDCProxyCreationCode.sol';
-import {IOpUSDCBridgeAdapter} from 'interfaces/IOpUSDCBridgeAdapter.sol';
+import {L1OpEURCBridgeAdapter} from 'contracts/L1OpEURCBridgeAdapter.sol';
+import {L1OpEURCFactory} from 'contracts/L1OpEURCFactory.sol';
+import {L2OpEURCBridgeAdapter} from 'contracts/L2OpEURCBridgeAdapter.sol';
+import {L2OpEURCDeploy} from 'contracts/L2OpEURCDeploy.sol';
+import {EURC_PROXY_CREATION_CODE} from 'contracts/utils/EURCProxyCreationCode.sol';
+import {IOpEURCBridgeAdapter} from 'interfaces/IOpEURCBridgeAdapter.sol';
 import {IOptimismPortal} from 'interfaces/external/IOptimismPortal.sol';
-import {IUSDC} from 'interfaces/external/IUSDC.sol';
+import {IEURC} from 'interfaces/external/IEURC.sol';
 import {Create2Deployer} from 'test/invariants/fuzz/Create2Deployer.sol';
-import {USDC_IMPLEMENTATION_CREATION_CODE} from 'test/utils/USDCImplementationCreationCode.sol';
+import {EURC_IMPLEMENTATION_CREATION_CODE} from 'test/utils/EURCImplementationCreationCode.sol';
 import {ITestCrossDomainMessenger} from 'test/utils/interfaces/ITestCrossDomainMessenger.sol';
 
 // solhint-disable
-contract OpUsdcTest_SymbTest is HalmosTest {
-  IUSDC usdcMainnet;
-  IUSDC usdcBridged;
+contract OpEurcTest_SymbTest is HalmosTest {
+  IEURC eurcMainnet;
+  IEURC eurcBridged;
 
-  L1OpUSDCBridgeAdapter internal l1Adapter;
-  L1OpUSDCFactory internal factory;
+  L1OpEURCBridgeAdapter internal l1Adapter;
+  L1OpEURCFactory internal factory;
 
-  L2OpUSDCBridgeAdapter internal l2Adapter;
-  L2OpUSDCDeploy internal l2Factory;
+  L2OpEURCBridgeAdapter internal l2Adapter;
+  L2OpEURCDeploy internal l2Factory;
 
   MockBridge internal mockMessenger;
   MockPortal internal mockPortal;
   Create2Deployer internal create2Deployer;
 
   address owner = address(bytes20(keccak256('owner')));
-  address usdcMinter = address(bytes20(keccak256('usdc minter')));
+  address eurcMinter = address(bytes20(keccak256('eurc minter')));
 
   function setUp() public {
     vm.assume(owner != address(0));
@@ -50,77 +50,77 @@ contract OpUsdcTest_SymbTest is HalmosTest {
     // Deploy l1 factory
     address targetAddress;
 
-    uint256 size = USDC_IMPLEMENTATION_CREATION_CODE.length;
-    bytes memory _usdcBytecode = USDC_IMPLEMENTATION_CREATION_CODE;
+    uint256 size = EURC_IMPLEMENTATION_CREATION_CODE.length;
+    bytes memory _eurcBytecode = EURC_IMPLEMENTATION_CREATION_CODE;
 
     assembly {
-      targetAddress := create(0, add(_usdcBytecode, 0x20), size) // Skip the 32 bytes encoded length.
+      targetAddress := create(0, add(_eurcBytecode, 0x20), size) // Skip the 32 bytes encoded length.
     }
 
     assert(targetAddress != address(0));
 
-    usdcMainnet = IUSDC(targetAddress);
+    eurcMainnet = IEURC(targetAddress);
 
-    factory = new L1OpUSDCFactory(address(usdcMainnet));
+    factory = new L1OpEURCFactory(address(eurcMainnet));
 
-    // Deploy l2 usdc and proxy
+    // Deploy l2 eurc and proxy
     address targetAddress2;
 
     assembly {
-      targetAddress2 := create(0, add(_usdcBytecode, 0x20), size) // Skip the 32 bytes encoded length.
+      targetAddress2 := create(0, add(_eurcBytecode, 0x20), size) // Skip the 32 bytes encoded length.
     }
 
     assert(targetAddress2 != address(0));
 
     address targetProxy;
-    bytes memory _usdcProxyCArgs = abi.encode(targetAddress2);
-    bytes memory _usdcProxyInitCode = bytes.concat(USDC_PROXY_CREATION_CODE, _usdcProxyCArgs);
-    uint256 sizeProxy = _usdcProxyInitCode.length;
+    bytes memory _eurcProxyCArgs = abi.encode(targetAddress2);
+    bytes memory _eurcProxyInitCode = bytes.concat(EURC_PROXY_CREATION_CODE, _eurcProxyCArgs);
+    uint256 sizeProxy = _eurcProxyInitCode.length;
 
     assembly {
-      targetProxy := create(0, add(_usdcProxyInitCode, 0x20), sizeProxy) // Skip the 32 bytes encoded length.
+      targetProxy := create(0, add(_eurcProxyInitCode, 0x20), sizeProxy) // Skip the 32 bytes encoded length.
     }
 
     assert(targetProxy != address(0));
 
-    usdcBridged = IUSDC(targetProxy);
+    eurcBridged = IEURC(targetProxy);
 
     // address computedAddress = HalmosUtils.computeCreateAddress(owner, 5); <-- no! create logic isn't supported, due to symbolic keccak oputput
     // Halmos deploy at address + 1, starting at 0xaaaa0000
 
     // Deploy l1 adapter
     address _l1AdapterImp = address(
-      new L1OpUSDCBridgeAdapter(address(usdcMainnet), address(mockMessenger), address(uint160(targetAddress2) + 5))
+      new L1OpEURCBridgeAdapter(address(eurcMainnet), address(mockMessenger), address(uint160(targetAddress2) + 5))
     );
 
-    l1Adapter = L1OpUSDCBridgeAdapter(
-      address(new ERC1967Proxy(_l1AdapterImp, abi.encodeCall(L1OpUSDCBridgeAdapter.initialize, owner)))
+    l1Adapter = L1OpEURCBridgeAdapter(
+      address(new ERC1967Proxy(_l1AdapterImp, abi.encodeCall(L1OpEURCBridgeAdapter.initialize, owner)))
     );
 
     address _l2AdapterImp =
-      address(new L2OpUSDCBridgeAdapter(address(usdcBridged), address(mockMessenger), address(l1Adapter)));
+      address(new L2OpEURCBridgeAdapter(address(eurcBridged), address(mockMessenger), address(l1Adapter)));
 
-    l2Adapter = L2OpUSDCBridgeAdapter(
-      address(new ERC1967Proxy(_l2AdapterImp, abi.encodeCall(L2OpUSDCBridgeAdapter.initialize, owner)))
+    l2Adapter = L2OpEURCBridgeAdapter(
+      address(new ERC1967Proxy(_l2AdapterImp, abi.encodeCall(L2OpEURCBridgeAdapter.initialize, owner)))
     );
 
-    // usdc l2 init txs
-    usdcBridged.changeAdmin(address(l2Adapter.FALLBACK_PROXY_ADMIN()));
+    // eurc l2 init txs
+    eurcBridged.changeAdmin(address(l2Adapter.FALLBACK_PROXY_ADMIN()));
 
-    usdcBridged.initialize('Bridged USDC', 'USDC.e', 'USD', 6, owner, address(l2Adapter), address(l2Adapter), owner);
+    eurcBridged.initialize('Bridged EURC', 'EURC.e', 'USD', 6, owner, address(l2Adapter), address(l2Adapter), owner);
 
-    usdcBridged.configureMinter(address(l2Adapter), type(uint256).max);
-    usdcBridged.updateMasterMinter(address(l2Adapter));
-    usdcBridged.transferOwnership(address(l2Adapter));
+    eurcBridged.configureMinter(address(l2Adapter), type(uint256).max);
+    eurcBridged.updateMasterMinter(address(l2Adapter));
+    eurcBridged.transferOwnership(address(l2Adapter));
 
     vm.stopPrank();
 
-    // Allow minting usdc
-    vm.prank(usdcMainnet.masterMinter());
-    usdcMainnet.configureMinter(address(l1Adapter), type(uint256).max);
+    // Allow minting eurc
+    vm.prank(eurcMainnet.masterMinter());
+    eurcMainnet.configureMinter(address(l1Adapter), type(uint256).max);
 
-    vm.prank(usdcMainnet.masterMinter());
-    usdcMainnet.configureMinter(address(usdcMinter), type(uint256).max);
+    vm.prank(eurcMainnet.masterMinter());
+    eurcMainnet.configureMinter(address(eurcMinter), type(uint256).max);
   }
 
   /// @custom:property-id 0
@@ -128,13 +128,13 @@ contract OpUsdcTest_SymbTest is HalmosTest {
   function check_setup() public view {
     assert(l2Adapter.LINKED_ADAPTER() == address(l1Adapter));
     assert(l2Adapter.MESSENGER() == address(mockMessenger));
-    assert(l2Adapter.USDC() == address(usdcBridged));
+    assert(l2Adapter.EURC() == address(eurcBridged));
     assert(address(l2Adapter.FALLBACK_PROXY_ADMIN()) != address(0));
-    assert(usdcBridged.admin() == address(l2Adapter.FALLBACK_PROXY_ADMIN()));
+    assert(eurcBridged.admin() == address(l2Adapter.FALLBACK_PROXY_ADMIN()));
 
     assert(l1Adapter.LINKED_ADAPTER() == address(l2Adapter));
     assert(l1Adapter.MESSENGER() == address(mockMessenger));
-    assert(l1Adapter.USDC() == address(usdcMainnet));
+    assert(l1Adapter.EURC() == address(eurcMainnet));
   }
 
   /// @custom:property-id 1
@@ -175,20 +175,20 @@ contract OpUsdcTest_SymbTest is HalmosTest {
     // Precondition
     _mainnetMint(sender, amt);
 
-    vm.assume(usdcMainnet.balanceOf(sender) < 2 ** 255 - 1 - amt);
-    vm.assume(usdcMainnet.balanceOf(address(l1Adapter)) < 2 ** 255 - 1 - amt);
+    vm.assume(eurcMainnet.balanceOf(sender) < 2 ** 255 - 1 - amt);
+    vm.assume(eurcMainnet.balanceOf(address(l1Adapter)) < 2 ** 255 - 1 - amt);
 
-    vm.assume(dest != address(0) && dest != address(usdcMainnet) && dest != address(usdcBridged));
+    vm.assume(dest != address(0) && dest != address(eurcMainnet) && dest != address(eurcBridged));
 
     vm.startPrank(sender);
-    usdcMainnet.approve(address(l1Adapter), amt);
+    eurcMainnet.approve(address(l1Adapter), amt);
 
     // Action
     l1Adapter.sendMessage(dest, amt, minGas);
 
     // Postcondition
-    assert(usdcBridged.balanceOf(dest) == amt);
-    assert(usdcMainnet.balanceOf(address(l1Adapter)) == usdcBridged.totalSupply());
+    assert(eurcBridged.balanceOf(dest) == amt);
+    assert(eurcMainnet.balanceOf(address(l1Adapter)) == eurcBridged.totalSupply());
   }
 
   /// @custom:property-id 5
@@ -205,14 +205,14 @@ contract OpUsdcTest_SymbTest is HalmosTest {
     _mainnetMint(sender, amt);
 
     vm.startPrank(sender);
-    usdcMainnet.approve(address(l1Adapter), amt);
+    eurcMainnet.approve(address(l1Adapter), amt);
     l1Adapter.sendMessage(sender, amt, 0);
     vm.stopPrank();
 
     // No burn before migration
     vm.startPrank(owner);
     // Action
-    try l1Adapter.burnLockedUSDC() {
+    try l1Adapter.burnLockedEURC() {
       // Postcondition
       assert(false); // This should not happen
     } catch {}
@@ -222,7 +222,7 @@ contract OpUsdcTest_SymbTest is HalmosTest {
     l1Adapter.migrateToNative(rolecaller, burner, 0, 0);
 
     // Action
-    try l1Adapter.burnLockedUSDC() {
+    try l1Adapter.burnLockedEURC() {
       // Postcondition
       assert(false); // Owner cannot burn
     } catch {}
@@ -233,9 +233,9 @@ contract OpUsdcTest_SymbTest is HalmosTest {
     vm.prank(burner);
 
     // Action
-    try l1Adapter.burnLockedUSDC() {
+    try l1Adapter.burnLockedEURC() {
       // Postcondition
-      assert(usdcMainnet.balanceOf(address(l1Adapter)) == 0);
+      assert(eurcMainnet.balanceOf(address(l1Adapter)) == 0);
       assert(l1Adapter.burnCaller() == address(0));
     } catch {
       assert(false);
@@ -260,7 +260,7 @@ contract OpUsdcTest_SymbTest is HalmosTest {
     vm.startPrank(owner);
     try l1Adapter.migrateToNative(roleCaller, burnCaller, 0, 0) {
       assert(l1Adapter.burnCaller() == burnCaller);
-      assert(l1Adapter.messengerStatus() == IOpUSDCBridgeAdapter.Status.Upgrading);
+      assert(l1Adapter.messengerStatus() == IOpEURCBridgeAdapter.Status.Upgrading);
     } catch {
       assert(false);
     }
@@ -269,14 +269,14 @@ contract OpUsdcTest_SymbTest is HalmosTest {
     try l1Adapter.migrateToNative(newRoleCaller, newBurnCaller, 0, 0) {
       // Postcondition
       assert(l1Adapter.burnCaller() == newBurnCaller);
-      assert(l1Adapter.messengerStatus() == IOpUSDCBridgeAdapter.Status.Upgrading);
+      assert(l1Adapter.messengerStatus() == IOpEURCBridgeAdapter.Status.Upgrading);
     } catch {
       assert(false);
     }
   }
 
   /// @custom:property-id 12
-  /// @custom:property All in flight transactions should successfully settle after a migration to native usdc
+  /// @custom:property All in flight transactions should successfully settle after a migration to native eurc
   function check_settleWhenUpgraded(address dest, uint256 amt) public {
     // Precondition
     _mainnetMint(address(l1Adapter), amt);
@@ -289,10 +289,10 @@ contract OpUsdcTest_SymbTest is HalmosTest {
     vm.prank(owner);
     l1Adapter.migrateToNative(roleCaller, burnCaller, 0, 0);
 
-    uint256 _destBalanceBefore = usdcMainnet.balanceOf(dest);
+    uint256 _destBalanceBefore = eurcMainnet.balanceOf(dest);
     vm.assume(_destBalanceBefore < 2 ** 255 - 1 - amt);
 
-    uint256 _l1AdapterBalanceBefore = usdcMainnet.balanceOf(address(l1Adapter));
+    uint256 _l1AdapterBalanceBefore = eurcMainnet.balanceOf(address(l1Adapter));
 
     mockMessenger.setDomainMessageSender(address(l2Adapter));
     vm.prank(l1Adapter.MESSENGER());
@@ -300,15 +300,15 @@ contract OpUsdcTest_SymbTest is HalmosTest {
     // Action
     try l1Adapter.receiveMessage(dest, dest, amt) {
       // Postcondition
-      assert(usdcMainnet.balanceOf(dest) == _destBalanceBefore + amt);
-      assert(usdcMainnet.balanceOf(address(l1Adapter)) == _l1AdapterBalanceBefore - amt);
+      assert(eurcMainnet.balanceOf(dest) == _destBalanceBefore + amt);
+      assert(eurcMainnet.balanceOf(address(l1Adapter)) == _l1AdapterBalanceBefore - amt);
     } catch {
       assert(false);
     }
   }
 
   /// @custom:property-id 13
-  /// @custom:property Bridged USDC Proxy should only be upgradeable through the L2 Adapter
+  /// @custom:property Bridged EURC Proxy should only be upgradeable through the L2 Adapter
   /// @custom:property-not-tested
   /// @dev test in commit history -- extcodehash representation has an unexpected behavior, seems to behave as a symbolic value (this make a isContract check fail in the OZ Address)
 
@@ -367,16 +367,16 @@ contract OpUsdcTest_SymbTest is HalmosTest {
     }
   }
 
-  /// @dev Mint arbitrary amount of USDC on mainnet to dest
+  /// @dev Mint arbitrary amount of EURC on mainnet to dest
   function _mainnetMint(address dest, uint256 amt) internal {
-    vm.assume(amt > 0); // cannot mint 0 usdc
-    vm.assume(usdcMainnet.balanceOf(dest) < 2 ** 255 - 1 - amt); // usdc max supply
-    vm.assume(usdcBridged.balanceOf(dest) < 2 ** 255 - 1 - amt);
+    vm.assume(amt > 0); // cannot mint 0 eurc
+    vm.assume(eurcMainnet.balanceOf(dest) < 2 ** 255 - 1 - amt); // eurc max supply
+    vm.assume(eurcBridged.balanceOf(dest) < 2 ** 255 - 1 - amt);
 
-    vm.assume(dest != address(0) && dest != address(usdcMainnet) && dest != address(usdcBridged)); // blacklisted addresses
+    vm.assume(dest != address(0) && dest != address(eurcMainnet) && dest != address(eurcBridged)); // blacklisted addresses
 
-    vm.prank(usdcMinter);
-    usdcMainnet.mint(dest, amt);
+    vm.prank(eurcMinter);
+    eurcMainnet.mint(dest, amt);
   }
 }
 

@@ -3,7 +3,7 @@ pragma solidity ^0.8.25;
 
 import {MessageHashUtils} from '@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol';
 import {Test} from 'forge-std/Test.sol';
-import {IOpUSDCBridgeAdapter} from 'interfaces/IOpUSDCBridgeAdapter.sol';
+import {IOpEURCBridgeAdapter} from 'interfaces/IOpEURCBridgeAdapter.sol';
 import {SigUtils} from 'test/utils/SigUtils.sol';
 
 contract Helpers is Test {
@@ -35,7 +35,7 @@ contract Helpers is Test {
     uint256 _signerPk,
     address _adapter
   ) internal returns (bytes memory _signature) {
-    IOpUSDCBridgeAdapter.BridgeMessage memory _message = IOpUSDCBridgeAdapter.BridgeMessage({
+    IOpEURCBridgeAdapter.BridgeMessage memory _message = IOpEURCBridgeAdapter.BridgeMessage({
       to: _to,
       amount: _amount,
       deadline: _deadline,

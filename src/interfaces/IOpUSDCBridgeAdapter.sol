@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-interface IOpUSDCBridgeAdapter {
+interface IOpEURCBridgeAdapter {
   /*///////////////////////////////////////////////////////////////
                             ENUMS
   ///////////////////////////////////////////////////////////////*/
@@ -78,11 +78,11 @@ interface IOpUSDCBridgeAdapter {
   event MessagingResumed(address _messenger);
 
   /**
-   * @notice Emitted when the adapter is migrating usdc to native
+   * @notice Emitted when the adapter is migrating eurc to native
    * @param _messenger The address of the messenger contract that is doing the migration
    * @param _caller The address that will be allowed to call the permissioned function on the given chain
-   * @dev On L1 _caller can call burnLockedUSDC
-   * @dev On L2 _caller can call transferUSDCRoles
+   * @dev On L1 _caller can call burnLockedEURC
+   * @dev On L2 _caller can call transferEURCRoles
    */
   event MigratingToNative(address _messenger, address _caller);
 
@@ -114,74 +114,74 @@ interface IOpUSDCBridgeAdapter {
   ///////////////////////////////////////////////////////////////*/
 
   /**
-   * @notice Error when burnLockedUSDC is called before a burn amount is set
+   * @notice Error when burnLockedEURC is called before a burn amount is set
    */
-  error IOpUSDCBridgeAdapter_BurnAmountNotSet();
+  error IOpEURCBridgeAdapter_BurnAmountNotSet();
 
   /**
    * @notice Error when the caller is not the roleCaller
    */
-  error IOpUSDCBridgeAdapter_InvalidCaller();
+  error IOpEURCBridgeAdapter_InvalidCaller();
 
   /**
    * @notice Error when address is not valid
    */
-  error IOpUSDCBridgeAdapter_InvalidAddress();
+  error IOpEURCBridgeAdapter_InvalidAddress();
 
   /**
    * @notice Error when the owner transaction is invalid
    */
-  error IOpUSDCBridgeAdapter_InvalidTransaction();
+  error IOpEURCBridgeAdapter_InvalidTransaction();
 
   /**
    * @notice Error when signature is not valid
    */
-  error IOpUSDCBridgeAdapter_ForbiddenTransaction();
+  error IOpEURCBridgeAdapter_ForbiddenTransaction();
 
   /**
    * @notice Error when messaging is disabled
    */
-  error IOpUSDCBridgeAdapter_MessagingDisabled();
+  error IOpEURCBridgeAdapter_MessagingDisabled();
 
   /**
    * @notice Error when messaging is enabled
    */
-  error IOpUSDCBridgeAdapter_MessagingEnabled();
+  error IOpEURCBridgeAdapter_MessagingEnabled();
 
   /**
    * @notice Error when the caller is not the linked adapter
    */
-  error IOpUSDCBridgeAdapter_InvalidSender();
+  error IOpEURCBridgeAdapter_InvalidSender();
 
   /**
    * @notice Error when the nonce is already used for the given signature
    */
-  error IOpUSDCBridgeAdapter_InvalidNonce();
+  error IOpEURCBridgeAdapter_InvalidNonce();
 
   /**
    * @notice Error when the signature is invalid
    */
-  error IOpUSDCBridgeAdapter_InvalidSignature();
+  error IOpEURCBridgeAdapter_InvalidSignature();
 
   /**
    * @notice Error when the deadline has passed
    */
-  error IOpUSDCBridgeAdapter_MessageExpired();
+  error IOpEURCBridgeAdapter_MessageExpired();
 
   /**
    * @notice Error when the contract is not in the upgrading state
    */
-  error IOpUSDCBridgeAdapter_NotUpgrading();
+  error IOpEURCBridgeAdapter_NotUpgrading();
 
   /**
    * @notice Error when the address is blacklisted
    */
-  error IOpUSDCBridgeAdapter_BlacklistedAddress();
+  error IOpEURCBridgeAdapter_BlacklistedAddress();
 
   /**
-   *  @notice Error when bridgedUSDC has not been migrated yet to native USDC
+   *  @notice Error when bridgedEURC has not been migrated yet to native EURC
    */
-  error IOpUSDCBridgeAdapter_NotMigrated();
+  error IOpEURCBridgeAdapter_NotMigrated();
 
   /*///////////////////////////////////////////////////////////////
                             LOGIC
@@ -250,11 +250,11 @@ interface IOpUSDCBridgeAdapter {
   ///////////////////////////////////////////////////////////////*/
 
   /**
-   * @notice Fetches address of the USDC token
-   * @return _usdc Address of the USDC token
+   * @notice Fetches address of the EURC token
+   * @return _eurc Address of the EURC token
    */
   // solhint-disable-next-line func-name-mixedcase
-  function USDC() external view returns (address _usdc);
+  function EURC() external view returns (address _eurc);
 
   /**
    * @notice Fetches address of the linked adapter on L2 to send messages to and receive from

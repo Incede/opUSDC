@@ -1,7 +1,7 @@
 pragma solidity 0.8.25;
 
 import {ShortString, ShortStrings} from '@openzeppelin/contracts/utils/ShortStrings.sol';
-import {IOpUSDCBridgeAdapter} from 'interfaces/IOpUSDCBridgeAdapter.sol';
+import {IOpEURCBridgeAdapter} from 'interfaces/IOpEURCBridgeAdapter.sol';
 
 contract SigUtils {
   using ShortStrings for *;
@@ -38,7 +38,7 @@ contract SigUtils {
    */
   // forgefmt: disable-start
   function getTypedBridgeMessageHash(
-    IOpUSDCBridgeAdapter.BridgeMessage memory _message
+    IOpEURCBridgeAdapter.BridgeMessage memory _message
   ) public view returns (bytes32 _hash) {
     _hash = keccak256(abi.encodePacked('\x19\x01', _DOMAIN_SEPARATOR, getBridgeMessageHash(_message)));
   }
@@ -50,7 +50,7 @@ contract SigUtils {
    * @return _hash The hash of the bridge message struct
    */
   // solhint-disable-next-line max-line-length
-  function getBridgeMessageHash(IOpUSDCBridgeAdapter.BridgeMessage memory _message) public pure returns (bytes32 _hash) {
+  function getBridgeMessageHash(IOpEURCBridgeAdapter.BridgeMessage memory _message) public pure returns (bytes32 _hash) {
     _hash = keccak256(
       abi.encode(
         BRIDGE_MESSAGE_TYPEHASH, _message.to, _message.amount, _message.deadline, _message.nonce, _message.minGasLimit

@@ -1,5 +1,5 @@
 TN:
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/node_modules/@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/node_modules/@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol
 DA:1,0
 DA:32,3
 DA:51,1
@@ -24,7 +24,7 @@ DA:116,10
 DA:117,5
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol
 DA:104,5
 DA:106,1
 DA:109,8
@@ -53,7 +53,7 @@ DA:216,5
 DA:225,2
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol
 DA:22,0
 DA:32,0
 DA:52,0
@@ -78,11 +78,11 @@ DA:147,0
 DA:150,0
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/node_modules/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/node_modules/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol
 DA:24,2
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/node_modules/@openzeppelin/contracts-upgradeable/utils/cryptography/EIP712Upgradeable.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/node_modules/@openzeppelin/contracts-upgradeable/utils/cryptography/EIP712Upgradeable.sol
 DA:34,1
 DA:52,2
 DA:68,1
@@ -131,7 +131,7 @@ DA:203,0
 DA:204,0
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/node_modules/@openzeppelin/contracts/access/Ownable.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/node_modules/@openzeppelin/contracts/access/Ownable.sol
 DA:39,0
 DA:40,0
 DA:42,0
@@ -153,16 +153,16 @@ DA:97,0
 DA:98,0
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/node_modules/@openzeppelin/contracts/interfaces/IERC1271.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/node_modules/@openzeppelin/contracts/interfaces/IERC1271.sol
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/node_modules/@openzeppelin/contracts/interfaces/IERC5267.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/node_modules/@openzeppelin/contracts/interfaces/IERC5267.sol
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/node_modules/@openzeppelin/contracts/interfaces/draft-IERC1822.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/node_modules/@openzeppelin/contracts/interfaces/draft-IERC1822.sol
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/node_modules/@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/node_modules/@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol
 DA:15,6
 DA:26,12
 DA:27,3
@@ -170,7 +170,7 @@ DA:37,6
 DA:38,8
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/node_modules/@openzeppelin/contracts/proxy/ERC1967/ERC1967Utils.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/node_modules/@openzeppelin/contracts/proxy/ERC1967/ERC1967Utils.sol
 DA:14,0
 DA:37,2
 DA:62,2
@@ -190,7 +190,7 @@ DA:189,0
 DA:190,0
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/node_modules/@openzeppelin/contracts/proxy/Proxy.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/node_modules/@openzeppelin/contracts/proxy/Proxy.sol
 DA:22,2
 DA:27,8
 DA:31,10
@@ -204,16 +204,16 @@ DA:59,10
 DA:67,5
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/node_modules/@openzeppelin/contracts/proxy/beacon/IBeacon.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/node_modules/@openzeppelin/contracts/proxy/beacon/IBeacon.sol
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Permit.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Permit.sol
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol
 DA:19,0
 DA:36,1
 DA:37,49
@@ -225,7 +225,7 @@ DA:97,30
 DA:98,0
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/node_modules/@openzeppelin/contracts/utils/Address.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/node_modules/@openzeppelin/contracts/utils/Address.sol
 DA:9,0
 DA:70,2
 DA:71,6
@@ -251,11 +251,11 @@ DA:153,5
 DA:156,0
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/node_modules/@openzeppelin/contracts/utils/Context.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/node_modules/@openzeppelin/contracts/utils/Context.sol
 DA:18,1
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/node_modules/@openzeppelin/contracts/utils/ShortStrings.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/node_modules/@openzeppelin/contracts/utils/ShortStrings.sol
 DA:40,0
 DA:42,0
 DA:52,0
@@ -269,15 +269,15 @@ DA:91,0
 DA:93,0
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/node_modules/@openzeppelin/contracts/utils/StorageSlot.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/node_modules/@openzeppelin/contracts/utils/StorageSlot.sol
 DA:31,0
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/node_modules/@openzeppelin/contracts/utils/Strings.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/node_modules/@openzeppelin/contracts/utils/Strings.sol
 DA:12,0
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/node_modules/@openzeppelin/contracts/utils/cryptography/ECDSA.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/node_modules/@openzeppelin/contracts/utils/cryptography/ECDSA.sol
 DA:12,0
 DA:56,10
 DA:57,7
@@ -297,7 +297,7 @@ DA:144,0
 DA:147,5
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/node_modules/@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/node_modules/@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol
 DA:15,0
 DA:76,1
 DA:79,2
@@ -307,7 +307,7 @@ DA:82,4
 DA:83,4
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/node_modules/@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/node_modules/@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol
 DA:14,0
 DA:22,9
 DA:23,11
@@ -323,32 +323,32 @@ DA:45,0
 DA:46,0
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/node_modules/@openzeppelin/contracts/utils/math/Math.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/node_modules/@openzeppelin/contracts/utils/math/Math.sol
 DA:9,0
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/node_modules/@openzeppelin/contracts/utils/math/SignedMath.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/node_modules/@openzeppelin/contracts/utils/math/SignedMath.sol
 DA:9,0
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/node_modules/forge-std/src/Base.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/node_modules/forge-std/src/Base.sol
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/node_modules/forge-std/src/StdAssertions.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/node_modules/forge-std/src/StdAssertions.sol
 DA:38,0
 DA:39,0
 DA:40,0
 DA:42,0
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/node_modules/forge-std/src/StdChains.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/node_modules/forge-std/src/StdChains.sol
 DA:66,0
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/node_modules/forge-std/src/StdCheats.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/node_modules/forge-std/src/StdCheats.sol
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/node_modules/forge-std/src/StdError.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/node_modules/forge-std/src/StdError.sol
 DA:5,0
 DA:6,0
 DA:7,0
@@ -361,7 +361,7 @@ DA:13,0
 DA:14,0
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/node_modules/forge-std/src/StdInvariant.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/node_modules/forge-std/src/StdInvariant.sol
 DA:78,0
 DA:79,0
 DA:82,0
@@ -382,58 +382,58 @@ DA:110,0
 DA:111,0
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/node_modules/forge-std/src/StdJson.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/node_modules/forge-std/src/StdJson.sol
 DA:25,0
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/node_modules/forge-std/src/StdMath.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/node_modules/forge-std/src/StdMath.sol
 DA:4,0
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/node_modules/forge-std/src/StdStorage.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/node_modules/forge-std/src/StdStorage.sol
 DA:24,0
 DA:334,0
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/node_modules/forge-std/src/StdStyle.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/node_modules/forge-std/src/StdStyle.sol
 DA:6,0
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/node_modules/forge-std/src/StdToml.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/node_modules/forge-std/src/StdToml.sol
 DA:25,0
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/node_modules/forge-std/src/StdUtils.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/node_modules/forge-std/src/StdUtils.sol
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/node_modules/forge-std/src/Test.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/node_modules/forge-std/src/Test.sol
 DA:32,0
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/node_modules/forge-std/src/Vm.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/node_modules/forge-std/src/Vm.sol
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/node_modules/forge-std/src/console.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/node_modules/forge-std/src/console.sol
 DA:4,0
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/node_modules/forge-std/src/console2.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/node_modules/forge-std/src/console2.sol
 DA:9,0
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/node_modules/forge-std/src/interfaces/IERC165.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/node_modules/forge-std/src/interfaces/IERC165.sol
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/node_modules/forge-std/src/interfaces/IERC20.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/node_modules/forge-std/src/interfaces/IERC20.sol
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/node_modules/forge-std/src/interfaces/IERC721.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/node_modules/forge-std/src/interfaces/IERC721.sol
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/node_modules/forge-std/src/interfaces/IMulticall3.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/node_modules/forge-std/src/interfaces/IMulticall3.sol
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/node_modules/forge-std/src/mocks/MockERC20.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/node_modules/forge-std/src/mocks/MockERC20.sol
 DA:8,0
 DA:19,0
 DA:20,0
@@ -519,7 +519,7 @@ DA:227,0
 DA:232,0
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/node_modules/forge-std/src/mocks/MockERC721.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/node_modules/forge-std/src/mocks/MockERC721.sol
 DA:8,0
 DA:17,0
 DA:18,0
@@ -578,17 +578,17 @@ DA:226,0
 DA:229,0
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/node_modules/forge-std/src/safeconsole.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/node_modules/forge-std/src/safeconsole.sol
 DA:6,0
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/node_modules/halmos-cheatcodes/src/SVM.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/node_modules/halmos-cheatcodes/src/SVM.sol
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/node_modules/halmos-cheatcodes/src/SymTest.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/node_modules/halmos-cheatcodes/src/SymTest.sol
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/src/contracts/L1OpUSDCBridgeAdapter.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/src/contracts/L1OpEURCBridgeAdapter.sol
 DA:18,296
 DA:22,29
 DA:25,22
@@ -680,7 +680,7 @@ DA:329,32
 DA:332,23
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/src/contracts/L1OpUSDCFactory.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/src/contracts/L1OpEURCFactory.sol
 DA:20,39
 DA:22,1
 DA:25,0
@@ -712,7 +712,7 @@ DA:119,54
 DA:121,13
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/src/contracts/L2OpUSDCBridgeAdapter.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/src/contracts/L2OpEURCBridgeAdapter.sol
 DA:20,178
 DA:36,0
 DA:39,14
@@ -803,7 +803,7 @@ DA:310,32
 DA:313,23
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/src/contracts/L2OpUSDCDeploy.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/src/contracts/L2OpEURCDeploy.sol
 DA:19,0
 DA:20,0
 DA:32,0
@@ -842,7 +842,7 @@ DA:113,0
 DA:114,0
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/src/contracts/universal/OpUSDCBridgeAdapter.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/src/contracts/universal/OpEURCBridgeAdapter.sol
 DA:17,0
 DA:18,1
 DA:21,12
@@ -870,7 +870,7 @@ DA:152,25
 DA:153,20
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/src/contracts/utils/FallbackProxyAdmin.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/src/contracts/utils/FallbackProxyAdmin.sol
 DA:15,39
 DA:17,0
 DA:23,0
@@ -883,44 +883,44 @@ DA:50,0
 DA:51,0
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/src/contracts/utils/USDCInitTxs.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/src/contracts/utils/EURCInitTxs.sol
 DA:10,0
 DA:14,26
 DA:19,27
 DA:24,53
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/src/contracts/utils/USDCProxyCreationCode.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/src/contracts/utils/EURCProxyCreationCode.sol
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/src/interfaces/IL1OpUSDCBridgeAdapter.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/src/interfaces/IL1OpEURCBridgeAdapter.sol
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/src/interfaces/IL1OpUSDCFactory.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/src/interfaces/IL1OpEURCFactory.sol
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/src/interfaces/IL2OpUSDCBridgeAdapter.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/src/interfaces/IL2OpEURCBridgeAdapter.sol
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/src/interfaces/IL2OpUSDCDeploy.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/src/interfaces/IL2OpEURCDeploy.sol
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/src/interfaces/IOpUSDCBridgeAdapter.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/src/interfaces/IOpEURCBridgeAdapter.sol
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/src/interfaces/external/ICreate2Deployer.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/src/interfaces/external/ICreate2Deployer.sol
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/src/interfaces/external/ICrossDomainMessenger.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/src/interfaces/external/ICrossDomainMessenger.sol
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/src/interfaces/external/IOptimismPortal.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/src/interfaces/external/IOptimismPortal.sol
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/src/interfaces/external/IUSDC.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/src/interfaces/external/IEURC.sol
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/src/libraries/CrossChainDeployments.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/src/libraries/CrossChainDeployments.sol
 DA:13,24
 DA:21,5
 DA:32,35
@@ -965,7 +965,7 @@ DA:120,0
 DA:123,8
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/test/invariants/AdvancedTestsUtils.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/test/invariants/AdvancedTestsUtils.sol
 DA:54,0
 DA:55,0
 DA:56,0
@@ -993,7 +993,7 @@ DA:115,0
 DA:117,0
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/test/invariants/fuzz/Create2Deployer.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/test/invariants/fuzz/Create2Deployer.sol
 DA:5,0
 DA:7,0
 DA:8,0
@@ -1004,7 +1004,7 @@ DA:15,0
 DA:17,0
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/test/invariants/fuzz/MockBridge.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/test/invariants/fuzz/MockBridge.sol
 DA:7,63
 DA:8,0
 DA:13,25
@@ -1033,12 +1033,12 @@ DA:58,3
 DA:65,0
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/test/invariants/fuzz/MockPortal.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/test/invariants/fuzz/MockPortal.sol
 DA:6,17
 DA:7,16
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/test/invariants/fuzz/OpUsdc.t.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/test/invariants/fuzz/OpEurc.t.sol
 DA:15,264
 DA:33,5
 DA:34,78
@@ -1612,7 +1612,7 @@ DA:1119,66
 DA:1120,19
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/test/invariants/fuzz/SetupOpUSDC.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/test/invariants/fuzz/SetupOpEURC.sol
 DA:18,0
 DA:19,0
 DA:26,0
@@ -1669,7 +1669,7 @@ DA:128,0
 DA:131,0
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/test/utils/SigUtils.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/test/utils/SigUtils.sol
 DA:6,48
 DA:10,1
 DA:11,4
@@ -1688,9 +1688,9 @@ DA:55,12
 DA:56,25
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/test/utils/USDCImplementationCreationCode.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/test/utils/EURCImplementationCreationCode.sol
 end_of_record
 
-SF:/Users/drgorilla/Documents/defiSucks/opUSDC/test/utils/interfaces/ITestCrossDomainMessenger.sol
+SF:/Users/drgorilla/Documents/defiSucks/opEURC/test/utils/interfaces/ITestCrossDomainMessenger.sol
 end_of_record
 

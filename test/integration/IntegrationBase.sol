@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-import {L1OpUSDCBridgeAdapter} from 'contracts/L1OpUSDCBridgeAdapter.sol';
-import {IL1OpUSDCFactory, L1OpUSDCFactory} from 'contracts/L1OpUSDCFactory.sol';
-import {L2OpUSDCBridgeAdapter} from 'contracts/L2OpUSDCBridgeAdapter.sol';
-import {L2OpUSDCDeploy} from 'contracts/L2OpUSDCDeploy.sol';
-import {USDCInitTxs} from 'contracts/utils/USDCInitTxs.sol';
+import {L1OpEURCBridgeAdapter} from 'contracts/L1OpEURCBridgeAdapter.sol';
+import {IL1OpEURCFactory, L1OpEURCFactory} from 'contracts/L1OpEURCFactory.sol';
+import {L2OpEURCBridgeAdapter} from 'contracts/L2OpEURCBridgeAdapter.sol';
+import {L2OpEURCDeploy} from 'contracts/L2OpEURCDeploy.sol';
+import {EURCInitTxs} from 'contracts/utils/EURCInitTxs.sol';
 import {StdStorage, stdStorage} from 'forge-std/StdStorage.sol';
-import {IL2OpUSDCDeploy} from 'interfaces/IL2OpUSDCDeploy.sol';
-import {IUSDC} from 'interfaces/external/IUSDC.sol';
+import {IL2OpEURCDeploy} from 'interfaces/IL2OpEURCDeploy.sol';
+import {IEURC} from 'interfaces/external/IEURC.sol';
 import {AddressAliasHelper} from 'test/utils/AddressAliasHelper.sol';
 import {Helpers} from 'test/utils/Helpers.sol';
-import {USDC_IMPLEMENTATION_CREATION_CODE} from 'test/utils/USDCImplementationCreationCode.sol';
+import {EURC_IMPLEMENTATION_CREATION_CODE} from 'test/utils/EURCImplementationCreationCode.sol';
 import {ITestCrossDomainMessenger} from 'test/utils/interfaces/ITestCrossDomainMessenger.sol';
 
 contract IntegrationBase is Helpers {
@@ -22,8 +22,8 @@ contract IntegrationBase is Helpers {
   uint256 internal constant _OPTIMISM_FORK_BLOCK = 121_876_282;
   uint256 internal constant _BASE_FORK_BLOCK = 16_281_004;
 
-  IUSDC public constant MAINNET_USDC = IUSDC(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48);
-  address public constant MAINNET_USDC_IMPLEMENTATION = 0x43506849D7C04F9138D1A2050bbF3A0c054402dd;
+  IEURC public constant MAINNET_EURC = IEURC(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48);
+  address public constant MAINNET_EURC_IMPLEMENTATION = 0x43506849D7C04F9138D1A2050bbF3A0c054402dd;
   address public constant L2_CREATE2_DEPLOYER = 0x13b0D85CcB8bf860b6b79AF3029fCA081AE9beF2;
   address public constant OPTIMISM_PORTAL = 0xbEb5Fc579115071764c7423A4f12eDde41f106Ed;
   ITestCrossDomainMessenger public constant L2_MESSENGER =
@@ -60,39 +60,39 @@ contract IntegrationBase is Helpers {
   address internal _user = makeAddr('user');
 
   // Helper variables
-  bytes[] public usdcInitTxns = new bytes[](3);
+  bytes[] public eurcInitTxns = new bytes[](3);
   bytes public initialize;
 
-  // OpUSDC Protocol
-  L1OpUSDCBridgeAdapter public l1Adapter;
-  L1OpUSDCFactory public l1Factory;
-  L2OpUSDCDeploy public l2Factory;
-  L2OpUSDCBridgeAdapter public l2Adapter;
-  IUSDC public bridgedUSDC;
-  IL2OpUSDCDeploy.USDCInitializeData public usdcInitializeData;
-  IL1OpUSDCFactory.L2Deployments public l2Deployments;
+  // OpEURC Protocol
+  L1OpEURCBridgeAdapter public l1Adapter;
+  L1OpEURCFactory public l1Factory;
+  L2OpEURCDeploy public l2Factory;
+  L2OpEURCBridgeAdapter public l2Adapter;
+  IEURC public bridgedEURC;
+  IL2OpEURCDeploy.EURCInitializeData public eurcInitializeData;
+  IL1OpEURCFactory.L2Deployments public l2Deployments;
 
   function setUp() public virtual {
     mainnet = vm.createFork(vm.rpcUrl('mainnet'), _MAINNET_FORK_BLOCK);
     optimism = vm.createFork(vm.rpcUrl('optimism'), _OPTIMISM_FORK_BLOCK);
     base = vm.createFork(vm.rpcUrl('base'), _BASE_FORK_BLOCK);
 
-    l1Factory = new L1OpUSDCFactory(address(MAINNET_USDC));
+    l1Factory = new L1OpEURCFactory(address(MAINNET_EURC));
 
     vm.selectFork(optimism);
-    address _usdcImplAddr;
-    bytes memory _USDC_IMPLEMENTATION_CREATION_CODE = USDC_IMPLEMENTATION_CREATION_CODE;
+    address _eurcImplAddr;
+    bytes memory _EURC_IMPLEMENTATION_CREATION_CODE = EURC_IMPLEMENTATION_CREATION_CODE;
     assembly {
-      _usdcImplAddr :=
-        create(0, add(_USDC_IMPLEMENTATION_CREATION_CODE, 0x20), mload(_USDC_IMPLEMENTATION_CREATION_CODE))
+      _eurcImplAddr :=
+        create(0, add(_EURC_IMPLEMENTATION_CREATION_CODE, 0x20), mload(_EURC_IMPLEMENTATION_CREATION_CODE))
     }
 
     // Define the initialization transactions
-    usdcInitTxns[0] = USDCInitTxs.INITIALIZEV2;
-    usdcInitTxns[1] = USDCInitTxs.INITIALIZEV2_1;
-    usdcInitTxns[2] = USDCInitTxs.INITIALIZEV2_2;
+    eurcInitTxns[0] = EURCInitTxs.INITIALIZEV2;
+    eurcInitTxns[1] = EURCInitTxs.INITIALIZEV2_1;
+    eurcInitTxns[2] = EURCInitTxs.INITIALIZEV2_2;
     // Define the L2 deployments data
-    l2Deployments = IL1OpUSDCFactory.L2Deployments(_owner, _usdcImplAddr, MIN_GAS_LIMIT_DEPLOY, usdcInitTxns);
+    l2Deployments = IL1OpEURCFactory.L2Deployments(_owner, _eurcImplAddr, MIN_GAS_LIMIT_DEPLOY, eurcInitTxns);
 
     vm.selectFork(mainnet);
 
@@ -100,30 +100,30 @@ contract IntegrationBase is Helpers {
     (address _l1Adapter, address _l2Factory, address _l2Adapter) =
       l1Factory.deploy(address(OPTIMISM_L1_MESSENGER), _owner, CHAIN_NAME, l2Deployments);
 
-    l1Adapter = L1OpUSDCBridgeAdapter(_l1Adapter);
+    l1Adapter = L1OpEURCBridgeAdapter(_l1Adapter);
 
     // Get salt and initialize data for l2 deployments
     bytes32 _salt = bytes32(l1Factory.deploymentsSaltCounter());
-    usdcInitializeData = IL2OpUSDCDeploy.USDCInitializeData(
-      'Bridged USDC (Test)', l1Factory.USDC_SYMBOL(), MAINNET_USDC.currency(), MAINNET_USDC.decimals()
+    eurcInitializeData = IL2OpEURCDeploy.EURCInitializeData(
+      'Bridged EURC (Test)', l1Factory.EURC_SYMBOL(), MAINNET_EURC.currency(), MAINNET_EURC.decimals()
     );
 
     // Give max minting power to the master minter
-    address _masterMinter = MAINNET_USDC.masterMinter();
+    address _masterMinter = MAINNET_EURC.masterMinter();
     vm.prank(_masterMinter);
-    MAINNET_USDC.configureMinter(_masterMinter, type(uint256).max);
+    MAINNET_EURC.configureMinter(_masterMinter, type(uint256).max);
 
     vm.selectFork(optimism);
-    _relayL2Deployments(OP_ALIASED_L1_MESSENGER, _salt, _l1Adapter, usdcInitializeData, l2Deployments);
+    _relayL2Deployments(OP_ALIASED_L1_MESSENGER, _salt, _l1Adapter, eurcInitializeData, l2Deployments);
 
-    l2Adapter = L2OpUSDCBridgeAdapter(_l2Adapter);
-    bridgedUSDC = IUSDC(l2Adapter.USDC());
-    l2Factory = L2OpUSDCDeploy(_l2Factory);
+    l2Adapter = L2OpEURCBridgeAdapter(_l2Adapter);
+    bridgedEURC = IEURC(l2Adapter.EURC());
+    l2Factory = L2OpEURCDeploy(_l2Factory);
 
     // Make foundry know these two address exist on both forks
     vm.makePersistent(address(l1Adapter));
     vm.makePersistent(address(l2Adapter));
-    vm.makePersistent(address(bridgedUSDC));
+    vm.makePersistent(address(bridgedEURC));
     vm.makePersistent(address(l2Adapter.FALLBACK_PROXY_ADMIN()));
     vm.makePersistent(address(l2Factory));
   }
@@ -132,17 +132,17 @@ contract IntegrationBase is Helpers {
     address _aliasedL1Messenger,
     bytes32 _salt,
     address _l1Adapter,
-    IL2OpUSDCDeploy.USDCInitializeData memory _usdcInitializeData,
-    IL1OpUSDCFactory.L2Deployments memory _l2Deployments
+    IL2OpEURCDeploy.EURCInitializeData memory _eurcInitializeData,
+    IL1OpEURCFactory.L2Deployments memory _l2Deployments
   ) internal {
     bytes memory _l2FactoryCArgs = abi.encode(
       _l1Adapter,
       _l2Deployments.l2AdapterOwner,
-      _l2Deployments.usdcImplAddr,
-      _usdcInitializeData,
-      _l2Deployments.usdcInitTxs
+      _l2Deployments.eurcImplAddr,
+      _eurcInitializeData,
+      _l2Deployments.eurcInitTxs
     );
-    bytes memory _l2FactoryInitCode = bytes.concat(type(L2OpUSDCDeploy).creationCode, _l2FactoryCArgs);
+    bytes memory _l2FactoryInitCode = bytes.concat(type(L2OpEURCDeploy).creationCode, _l2FactoryCArgs);
 
     _relayL1ToL2Message(
       _aliasedL1Messenger,
@@ -158,13 +158,13 @@ contract IntegrationBase is Helpers {
     vm.selectFork(mainnet);
 
     // We need to do this instead of `deal` because deal doesnt change `totalSupply` state
-    vm.startPrank(MAINNET_USDC.masterMinter());
-    MAINNET_USDC.configureMinter(MAINNET_USDC.masterMinter(), _supply);
-    MAINNET_USDC.mint(_user, _supply);
+    vm.startPrank(MAINNET_EURC.masterMinter());
+    MAINNET_EURC.configureMinter(MAINNET_EURC.masterMinter(), _supply);
+    MAINNET_EURC.mint(_user, _supply);
     vm.stopPrank();
 
     vm.startPrank(_user);
-    MAINNET_USDC.approve(address(l1Adapter), _supply);
+    MAINNET_EURC.approve(address(l1Adapter), _supply);
     l1Adapter.sendMessage(_user, _supply, _MIN_GAS_LIMIT);
     vm.stopPrank();
 

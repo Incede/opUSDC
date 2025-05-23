@@ -5,12 +5,12 @@ coverageFormats: ["html","lcov"]
 allContracts: false
 codeSize: 0x9999
 deployContracts: [
-  ["0x1f", "USDCInitTxs"],
+  ["0x1f", "EURCInitTxs"],
   ["0x20", "CrossChainDeployments"],
   ["0x4200000000000000000000000000000000000007", "MockBridge"],
   ["0x13b0D85CcB8bf860b6b79AF3029fCA081AE9beF2", "Create2Deployer"]
 ]
-cryticArgs: ["--compile-libraries=(USDCInitTxs,0x1f),(CrossChainDeployments,0x20)"] 
+cryticArgs: ["--compile-libraries=(EURCInitTxs,0x1f),(CrossChainDeployments,0x20)"] 
 workers: 2
 seqLen: 200
 testLimit: 500000

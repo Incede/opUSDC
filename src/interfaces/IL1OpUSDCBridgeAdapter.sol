@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-interface IL1OpUSDCBridgeAdapter {
+interface IL1OpEURCBridgeAdapter {
   /*///////////////////////////////////////////////////////////////
                             EVENTS
   ///////////////////////////////////////////////////////////////*/
@@ -14,7 +14,7 @@ interface IL1OpUSDCBridgeAdapter {
 
   /**
    * @notice Emitted when the migration process is complete
-   * @param _burnedAmount The amount of USDC tokens that were burned
+   * @param _burnedAmount The amount of EURC tokens that were burned
    */
   event MigrationComplete(uint256 _burnedAmount);
 
@@ -23,9 +23,9 @@ interface IL1OpUSDCBridgeAdapter {
   ///////////////////////////////////////////////////////////////*/
 
   /**
-   * @notice Initiates the process to migrate the bridged USDC to native USDC
-   * @param _roleCaller The address that will be allowed to transfer the usdc roles
-   * @param _burnCaller The address that will be allowed to call this contract to burn the USDC tokens
+   * @notice Initiates the process to migrate the bridged EURC to native EURC
+   * @param _roleCaller The address that will be allowed to transfer the eurc roles
+   * @param _burnCaller The address that will be allowed to call this contract to burn the EURC tokens
    * @param _minGasLimitReceiveOnL2 Minimum gas limit that the message can be executed with on L2
    * @param _minGasLimitSetBurnAmount Minimum gas limit that the message can be executed with to set the burn amount
    */
@@ -37,17 +37,17 @@ interface IL1OpUSDCBridgeAdapter {
   ) external;
 
   /**
-   * @notice Sets the amount of USDC tokens that will be burned when the burnLockedUSDC function is called
-   * @param _amount The amount of USDC tokens that will be burned
+   * @notice Sets the amount of EURC tokens that will be burned when the burnLockedEURC function is called
+   * @param _amount The amount of EURC tokens that will be burned
    * @dev Only callable by a whitelisted messenger during its migration process
    */
   function setBurnAmount(uint256 _amount) external;
 
   /**
-   * @notice Burns the USDC tokens locked in the contract
+   * @notice Burns the EURC tokens locked in the contract
    * @dev The amount is determined by the burnAmount variable, which is set in the setBurnAmount function
    */
-  function burnLockedUSDC() external;
+  function burnLockedEURC() external;
 
   /**
    * @notice Send a message to the linked adapter to call receiveStopMessaging() and stop outgoing messages.
@@ -78,8 +78,8 @@ interface IL1OpUSDCBridgeAdapter {
   ///////////////////////////////////////////////////////////////*/
 
   /**
-   * @notice Fetches the amount of USDC tokens that will be burned when the burnLockedUSDC function is called
-   * @return _burnAmount The amount of USDC tokens that will be burned
+   * @notice Fetches the amount of EURC tokens that will be burned when the burnLockedEURC function is called
+   * @return _burnAmount The amount of EURC tokens that will be burned
    */
   function burnAmount() external view returns (uint256 _burnAmount);
 
